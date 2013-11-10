@@ -40,7 +40,7 @@ GEM
     erubis (2.7.0)
     execjs (2.0.2)
     geocoder (1.1.8)
-    gmaps4rails (2.0.3)
+    gmaps4rails (2.0.4)
     hike (1.2.3)
     i18n (0.6.5)
     journey (1.0.4)
@@ -101,7 +101,7 @@ GEM
       polyglot
       polyglot (>= 0.3.1)
     tzinfo (0.3.38)
-    uglifier (2.3.0)
+    uglifier (2.3.1)
       execjs (>= 0.3.0)
       json (>= 1.8.0)
     underscore-rails (1.5.2)

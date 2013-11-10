@@ -1,0 +1,23 @@
+<h1>Landing#index</h1>
+<p>Find me in app/views/landing/index.html.erb</p>
+
+<%= form_tag({:controller => 'landing', :action => 'index'}, :method => 'get') do %>
+    <%= label_tag(:text, 'Enter a Location:') %>
+    <%= text_field_tag(:text) %>
+    <%= submit_tag('Search')   %>
+<% end %>
+
+<%= link_to 'Add Location', new_location_path %>
+
+<div style='width: 800px;'>
+  <div id="map" style='width: 800px; height: 400px;'></div>
+</div>
+
+<script type="text/javascript">
+    handler = Gmaps.build('Google');
+    handler.buildMap({ provider: {}, internal: {id: 'map'}}, function(){
+        markers = handler.addMarkers(<%=raw @hash_coord.to_json %>);
+        handler.bounds.extendWith(markers);
+        handler.fitMapToBounds();
+    });
+</script>

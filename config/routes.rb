@@ -1,5 +1,13 @@
 TripApp::Application.routes.draw do
-  root :to => 'locations#index'
+  get "landing/index"
+
+  get "landing/login"
+
+  get "landing/browse"
+
+  resources :users
+
+  root :to => 'landing#index'
 
   resources :locations
 
