@@ -1,4 +1,5 @@
 class Location < ActiveRecord::Base
+  has_many :trip_items
   attr_accessible :address, :longitude, :latitude, :city, :country
   geocoded_by :address do |obj, results|
     if geo = results.first

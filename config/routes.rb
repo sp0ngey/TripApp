@@ -1,4 +1,8 @@
 TripApp::Application.routes.draw do
+  resources :trip_items
+
+  resources :trips
+
   get "landing/index"
 
   get "landing/login"
