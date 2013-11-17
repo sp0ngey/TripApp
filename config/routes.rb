@@ -1,19 +1,15 @@
 TripApp::Application.routes.draw do
-  resources :trip_items
-
-  resources :trips
-
-  get "landing/index"
-
-  get "landing/login"
-
-  get "landing/browse"
-
-  resources :users
-
   root :to => 'landing#index'
 
+  resources :trip_items
+  resources :users
+  resources :trips
   resources :locations
+
+  get "landing/index"
+  get "landing/login"
+  get "landing/browse"
+
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
