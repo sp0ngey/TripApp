@@ -34,8 +34,11 @@ gem 'geocoder'
 
 
 # To use ActiveModel has_secure_password
-# gem 'bcrypt-ruby', '~> 3.0.0'
+gem 'bcrypt-ruby', '~> 3.0.0'
+gem 'omniauth-facebook'
+gem 'omniauth-identity'
 
+gem "koala", "~> 1.7.0rc1"
 # To use Jbuilder templates for JSON
 # gem 'jbuilder'
 
