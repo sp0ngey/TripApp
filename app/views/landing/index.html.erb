@@ -1,7 +1,35 @@
 
-    <h1>Landing#index</h1>
-    <p>Find me in app/views/landing/index.html.erb</p>
+<div style="float:left; height: 100%; width: 49%; margin-right: 10px; padding: 10px; border: 1px solid red;">
+    <h1>Hi <%= current_user().name %></h1>
+    <div id="tabs">
+      <ul>
+        <li><a href="#YourTrips">Your trips</a></li>
+        <li><a href="#YourBookmarks">Bookmarks</a></li>
+      </ul>
 
+      <div id="YourTrips">
+        <% if @trips.nil? || @trips.length < 1 %>
+            You don't have any trips yet... better get planning!
+            <div>
+              <a href="#" id="NewTrip">New</a>
+            </div>
+        <% else %>
+            <p> These are your trips: </p>
+            <ul>
+            <% @trips.each do |thisTrip|  %>
+                <li><%= thisTrip.name %></li>
+            <% end %>
+            </ul>
+      <% end %>
+      </div>
+      <div id="YourBookmarks">
+        Todo
+      </div>
+    </div>
+</div>
+
+<div style="float:left; width: auto; padding: 10px; border: 1px solid blue;">
+    <h1> Search for something...</h1>
     <%= form_tag({:controller => 'landing', :action => 'index'}, :method => 'get') do %>
         <%= label_tag(:location, 'Enter a Location:') %>
         <%= text_field_tag(:location) %>
@@ -61,7 +89,7 @@
     <div style='width: 800px;'>
       <div id="map" style='width: 800px; height: 400px;'></div>
     </div>
-
+</div>
 
 <script type="text/javascript">
     handler = Gmaps.build('Google');
