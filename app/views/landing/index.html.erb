@@ -1,65 +1,67 @@
-<h1>Landing#index</h1>
-<p>Find me in app/views/landing/index.html.erb</p>
 
-<%= form_tag({:controller => 'landing', :action => 'index'}, :method => 'get') do %>
-    <%= label_tag(:location, 'Enter a Location:') %>
-    <%= text_field_tag(:location) %>
-    <%= submit_tag('Search')   %>
-<% end %>
+    <h1>Landing#index</h1>
+    <p>Find me in app/views/landing/index.html.erb</p>
 
-<% if @search_location.nil? %>
-    <%# TODO need to handle empty string search  %>
-<% else %>
-    <%= form_tag({:controller => 'locations', :action => 'create'}, :method => 'post') do %>
-        <%= hidden_field_tag :address, @search_location.first.data['address_components'][0]['long_name'] %>
-        <%= submit_tag('Add Location')   %>
+    <%= form_tag({:controller => 'landing', :action => 'index'}, :method => 'get') do %>
+        <%= label_tag(:location, 'Enter a Location:') %>
+        <%= text_field_tag(:location) %>
+        <%= submit_tag('Search')   %>
     <% end %>
 
-    <% @search_location.first.data['address_components'].each do |object1| %>
-        <table>
-          <tr><%= object1 %></tr>
+    <% if @search_location.nil? %>
+        <%# TODO need to handle empty string search  %>
+    <% else %>
+        <%= form_tag({:controller => 'locations', :action => 'create'}, :method => 'post') do %>
+            <%= hidden_field_tag :address, @search_location.first.data['address_components'][0]['long_name'] %>
+            <%= submit_tag('Add Location')   %>
+        <% end %>
+
+        <% @search_location.first.data['address_components'].each do |object1| %>
+            <table>
+              <tr><%= object1 %></tr>
+            </table>
+        <% end %>
+        <br>
+
+        <% @search_location.first.data['geometry'].each do |object2| %>
+            <table>
+              <tr><%= object2 %></tr>
+            </table>
+        <% end %>
+        <br>
+
+        <table border="1">
+          <tr>
+            <th>Long Name</th>
+            <th>City</th>
+            <th>Country Code</th>
+            <th>Country</th>
+            <th>Latitude</th>
+            <th>Longitude</th>
+            <th>Type</th>
+          </tr>
+          <tr>
+            <td><%= @search_location.first.data['address_components'][0]['long_name'] %></td>
+            <td><%= @search_location.first.city %></td>
+            <td><%= @search_location.first.country_code %></td>
+            <td><%= @search_location.first.country %></td>
+            <td><%= @search_location.first.coordinates[0] %></td>
+            <td><%= @search_location.first.coordinates[1] %></td>
+            <td><%= @search_location.first.types %></td>
+          </tr>
         </table>
+
+        <br>
+        <%#= @search_location %>
     <% end %>
-    <br>
-
-    <% @search_location.first.data['geometry'].each do |object2| %>
-        <table>
-          <tr><%= object2 %></tr>
-        </table>
-    <% end %>
-    <br>
-
-    <table border="1">
-      <tr>
-        <th>Long Name</th>
-        <th>City</th>
-        <th>Country Code</th>
-        <th>Country</th>
-        <th>Latitude</th>
-        <th>Longitude</th>
-        <th>Type</th>
-      </tr>
-      <tr>
-        <td><%= @search_location.first.data['address_components'][0]['long_name'] %></td>
-        <td><%= @search_location.first.city %></td>
-        <td><%= @search_location.first.country_code %></td>
-        <td><%= @search_location.first.country %></td>
-        <td><%= @search_location.first.coordinates[0] %></td>
-        <td><%= @search_location.first.coordinates[1] %></td>
-        <td><%= @search_location.first.types %></td>
-      </tr>
-    </table>
-
-    <br>
-    <%#= @search_location %>
-<% end %>
 
 
 
 
-<div style='width: 800px;'>
-  <div id="map" style='width: 800px; height: 400px;'></div>
-</div>
+    <div style='width: 800px;'>
+      <div id="map" style='width: 800px; height: 400px;'></div>
+    </div>
+
 
 <script type="text/javascript">
     handler = Gmaps.build('Google');

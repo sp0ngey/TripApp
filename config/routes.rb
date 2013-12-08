@@ -1,5 +1,13 @@
 TripApp::Application.routes.draw do
-  root :to => 'landing#index'
+  get "sessions/login"
+
+  get "session/login"
+
+  get "login/login"
+
+  get "login/login"
+
+  root :to => 'sessions#login'
 
   resources :trip_items
   resources :users
@@ -9,6 +17,8 @@ TripApp::Application.routes.draw do
   get "landing/index"
   get "landing/login"
   get "landing/browse"
+
+  match "/sessions/logout" => "sessions#destroy"
 
   match "/auth/:provider/callback" => "sessions#create"
   match "/auth/failure" => "sessions#failure"

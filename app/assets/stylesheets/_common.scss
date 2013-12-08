@@ -1,0 +1,13 @@
+@mixin shadow( $horizOff, $vertOff, $blurRadius, $spreadRadious, $colour)
+{
+  -moz-box-shadow:    $horizOff $vertOff $blurRadius $spreadRadious $colour;
+  -webkit-box-shadow: $horizOff $vertOff $blurRadius $spreadRadious $colour;
+  box-shadow:         $horizOff $vertOff $blurRadius $spreadRadious $colour;
+}
+
+@mixin borderRadius( $radius )
+{
+  -webkit-border-radius: $radius;
+  -moz-border-radius:    $radius;
+  border-radius:         $radius;
+}

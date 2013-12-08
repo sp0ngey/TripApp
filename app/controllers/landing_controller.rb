@@ -8,10 +8,19 @@ class LandingController < ApplicationController
       @hash_coord = [{"lat" => @search_location.first.coordinates[0], "lng" => @search_location.first.coordinates[1]}]
     end
 
+    render :index
+
   end
 
   def login
-  end
+    if current_user()
+      index()
+    else
+      respond_to do |format|
+        format.html
+      end
+    end
+end
 
   def browse
   end

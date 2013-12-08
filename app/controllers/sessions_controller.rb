@@ -1,6 +1,14 @@
 require 'pp'
 
 class SessionsController < ApplicationController
+  def login
+    if current_user().nil?
+      render
+    else
+      redirect_to landing_index_url
+    end
+  end
+
   def create
     auth = request.env["omniauth.auth"]
     dump = PP.pp(auth, "")
@@ -25,5 +33,9 @@ class SessionsController < ApplicationController
     session[:user_id] = nil
     logger.debug("Session id is " + ((session[:user_id].nil?) ? "NIL" : session[:user_id]));
     redirect_to root_url, :notice => "Signed out!"
+  end
+
+  def logout
+    destroy()
   end
 end
