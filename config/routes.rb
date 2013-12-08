@@ -19,6 +19,7 @@ TripApp::Application.routes.draw do
   get "landing/browse"
 
   match "/sessions/logout" => "sessions#destroy"
+  match "/trips/create" => "trips#create"
 
   match "/auth/:provider/callback" => "sessions#create"
   match "/auth/failure" => "sessions#failure"

@@ -11,7 +11,7 @@
         <% if @trips.nil? || @trips.length < 1 %>
             You don't have any trips yet... better get planning!
             <div>
-              <a href="#" id="NewTrip">New</a>
+              <a href="#" id="NewTripLink">New</a>
             </div>
         <% else %>
             <p> These are your trips: </p>
@@ -83,12 +83,24 @@
         <%#= @search_location %>
     <% end %>
 
-
-
-
     <div style='width: 800px;'>
       <div id="map" style='width: 800px; height: 400px;'></div>
     </div>
+</div>
+
+<div id="TripDialog" title="Create a new trip..." class="hidden">
+  <div id="TripDialogMessage" class="hidden">
+  </div>
+
+  <div id="TripDialogForm">
+    <form method='post'>
+      <label for='name'>Name:</label>
+      <input type='text' id='name' name='name'/>
+      <label for='description'>Description:</label>
+      <textarea id='description' name='description' cols="40" rows="10"></textarea>
+      <input type='hidden' id='user_id' name='user_id' value='<%= current_user().id %>'/>
+    </form>
+  </div>
 </div>
 
 <script type="text/javascript">
