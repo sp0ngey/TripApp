@@ -1,4 +1,4 @@
-
+<%= csrf_meta_tag %>
 <div style="float:left; height: 100%; width: 49%; margin-right: 10px; padding: 10px; border: 1px solid red;">
     <h1>Hi <%= current_user().name %></h1>
     <div id="tabs">
@@ -10,9 +10,6 @@
       <div id="YourTrips">
         <% if @trips.nil? || @trips.length < 1 %>
             You don't have any trips yet... better get planning!
-            <div>
-              <a href="#" id="NewTripLink">New</a>
-            </div>
         <% else %>
             <p> These are your trips: </p>
             <ul>
@@ -21,6 +18,9 @@
             <% end %>
             </ul>
       <% end %>
+            <div>
+                <a href="#" id="NewTripLink">New</a>
+            </div>
       </div>
       <div id="YourBookmarks">
         Todo
@@ -93,13 +93,12 @@
   </div>
 
   <div id="TripDialogForm">
-    <form method='post'>
-      <label for='name'>Name:</label>
-      <input type='text' id='name' name='name'/>
-      <label for='description'>Description:</label>
-      <textarea id='description' name='description' cols="40" rows="10"></textarea>
-      <input type='hidden' id='user_id' name='user_id' value='<%= current_user().id %>'/>
-    </form>
+    <%= form_tag("#") do %>
+        <%= label_tag(:name, 'Name:') %>
+        <%= text_field_tag(:name) %>
+        <%= label_tag(:description, 'Description:') %>
+        <%= text_area_tag(:description, "", size: "40x10") %>
+    <% end %>
   </div>
 </div>
 

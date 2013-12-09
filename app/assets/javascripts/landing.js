@@ -18,9 +18,17 @@ function InitTripDialog()
                     function(indx, el) {
                         var me = $(this);
                         var myTagName = me.prop('tagName');
+                        console.log("Processing element of type " + myTagName);
 
                         if( myTagName == "INPUT" || myTagName == "TEXTAREA" )
                         {
+                            var name = "trip[" + me.attr('name') + "]";
+                            console.log("Processing element " + name);
+                            jsonObj[name] = me.val();
+                        }
+                        else if( myTagName == "HIDDEN" )
+                        {
+                            console.log("Processing HIDDEN element " + me.attr('name'));
                             jsonObj[me.attr('name')] = me.val();
                         }
                     } );
@@ -59,3 +67,5 @@ $(function() {
     $("#NewTripLink").click(function() {  InitTripDialog().dialog("open"); });
     $("#tabs").tabs({ heightStyle: "fill" });
 });
+
+
