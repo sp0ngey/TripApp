@@ -99,21 +99,15 @@ function InitTripDialog(ref, command)
                         if( isAnEdit )
                         {
                             var myInputName = me.attr('name');
-                            if( myInputName == "name" )
-                            {
-                                me.val(_myTrips[ref].name)
-                            }
-                            else if ( myInputName == "description" )
-                            {
-                                me.val(_myTrips[ref].description)
-                            }
+                            if( myInputName == "name" )              { me.val(_myTrips[ref].name) }
+                            else if ( myInputName == "description" ) { me.val(_myTrips[ref].description) }
                         }
                         else { me.val(""); }
                     }
                 } );
         },
         buttons: {
-            "Do it!": function() {
+            "Do it...": function() {
                 var jsonObj = {};
                 var messageDiv =  $('#TripDialogMessage');
                 var tripFormDiv =  $('#TripDialogForm');
@@ -134,9 +128,14 @@ function InitTripDialog(ref, command)
                         }
                     } );
 
+                if( isAnEdit )
+                {
+                    jsonObj["_method"] = "put";
+                }
+
                 $.ajax({
                     type: 'post',
-                    url: isAnEdit ? '/trips/update/' + _myTrips[ref].id : '/trips/create',
+                    url: isAnEdit ? '/trips/' + _myTrips[ref].id : '/trips/create',
                     async: false,
                     data: jsonObj,
                     contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -144,7 +143,12 @@ function InitTripDialog(ref, command)
                     success: function(data) {
                         console.log("Success adding or editing trip...");
                         console.log(data);
-                        AppendTripTableRow(data);
+                        if( isAnEdit )
+                        {
+                            _myTrips[ref].name = jsonObj["trip[name]"];
+                            _myTrips[ref].description = jsonObj["trip[description]"];
+                        }
+                        else { AppendTripTableRow(data); }
                         $("#TripDialog").dialog("destroy");
                     },
                     error: function(jqXHR, status, error) {
