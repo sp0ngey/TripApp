@@ -21,7 +21,8 @@ function AppendTripTableRow(theTrip)
     $(editLink).click( function() { InitTripDialog($(this).attr("indx"), "Edit").dialog("open"); } );
     linkTd.append(editLink);
 
-    $(deleteLink).click( function() { alert("This doesn't work yet..."); } );
+    deleteLink.attr("indx", _myTrips.length);
+    $(deleteLink).click( function() { InitDeleteTripDialog($(this).attr("indx")).dialog("open"); } );
     deleteLink.append(deleteImg);
     linkTd.append(deleteLink);
 
@@ -36,7 +37,7 @@ function LoadTrips()
     $.ajax({
         type: 'post',
         url: '/trips/find',
-        data: { user_id: _myUserId},
+        data: { user_id: _myUserId },
         async: false,
         contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
         dataType: 'json',
@@ -54,6 +55,48 @@ function LoadTrips()
             tripsTableBody.append( $('<tr><td colspan="2">Error loading your trip list!</td></tr>') );
         }
     });
+}
+
+function InitDeleteTripDialog(indx)
+{
+    console.log(indx);
+    var deleteTripDialogDiv =  $( "#DeleteTripDialog" );
+    deleteTripDialogDiv.dialog({
+        resizable: false,
+        height:175,
+        width:400,
+        modal: true,
+        title: "Really delete trip " + _myTrips[indx].name,
+        buttons: {
+            "Delete trip!": function() {
+                console.log("DELETE");
+                $.ajax({
+                    type: 'post',
+                    url: '/trips/' + _myTrips[indx].id,
+                    async: false,
+                    data: { _method : "delete" },
+                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                    dataType: 'json',
+                    success: function(data) {
+                        console.log("Success deleting trip...");
+                        console.log(data);
+
+                        $("#DeleteTripDialog").dialog("destroy");
+                    },
+                    error: function(jqXHR, status, error) {
+                        console.log("status: " + status + "\nerror: " + error);
+                    }
+                });
+
+                $( this ).dialog( "destroy" );
+            },
+            Cancel: function() {
+                $( this ).dialog( "destroy" );
+            }
+        }
+    });
+
+    return deleteTripDialogDiv;
 }
 
 function InitTripDialog(ref, command)
@@ -169,6 +212,7 @@ function InitTripDialog(ref, command)
 
     return tripDialogDiv;
 }
+
 
 $(function() {
     console.log("Initialising the landing page...");
