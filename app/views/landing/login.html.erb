@@ -1,2 +1,52 @@
-<h1>Landing#login</h1>
-<p>Find me in app/views/landing/login.html.erb</p>
+<div id="welcomeContainer">
+    <div>
+        <div>
+            <% if( defined? @errorMessage ) %>
+                <H1><%=@errorMessage%></H1>
+            <% end %>
+
+            <p>Welcome to JBHNM. You must login to use the site. You can log in using the following methods...</p>
+            <ul>
+                <li><a id="LoginLink">Internal</a></li>
+                <li><a id="LoginLinkFB" href="/auth/facebook">Facebook</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div id="jbhnm-signing-identity" title="Sign In" class="hidden">
+    <div id="jbhnm-signing-identity-message" class="hidden">
+    </div>
+
+    <div id="jbhnm-signing-identity-form">
+        <form>
+            <fieldset>
+                <label for="email">Email</label>
+                <input type="text" name="auth_key" id="auth_key" value="" class="text ui-widget-content ui-corner-all" />
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all" />
+            </fieldset>
+        </form>
+
+        <span style="font-size:8pt">Not a registered user? <a id="RegisterLink">Sign up here...</a></span>
+    </div>
+</div>
+
+<div id="jbhnm-register-identity" title="Register..." class="hidden">
+    <div id="jbhnm-register-identity-message" class="hidden">
+    </div>
+
+    <div id="jbhnm-register-identity-form">
+        <form method='post'>
+            <label for='name'>Name:</label>
+            <input type='text' id='name' name='name'/>
+            <label for='email_register'>Email:</label>
+            <input type='text' id='email_register' name='email_register'/>
+            <label for='password_register'>Password:</label>
+            <input type='password' id='password_register' name='password_register'/>
+            <label for='password_confirmation'>Confirm Password:</label>
+            <input type='password' id='password_confirmation' name='password_confirmation'/>
+        </form>
+    </div>
+</div>
+

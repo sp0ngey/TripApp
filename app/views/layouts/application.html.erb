@@ -17,10 +17,17 @@
 </head>
 <body>
 
-<%= render 'authentication' %>
+<% if params[:controller] != "sessions" %>
+<!-- START: Header  --------------------------------------------------------------------------------------------------->
+<div class="header row">You are logged in as <%= current_user().name %>. Not you? <%= link_to "Logout...", :controller => :sessions, :action => :destroy %> </div>
+<div class="body row scroll-y">
+<% end %>
 
 <%= yield %>
 
-
+<% if params[:controller] != "sessions" %>
+<!-- START: Footer  --------------------------------------------------------------------------------------------------->
+</div>
+<% end %>
 </body>
 </html>

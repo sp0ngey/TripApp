@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <div id="AuthBar">
   <div id="AuthBar_In" class="<%= !current_user() ? "visible" : "hidden" %>">
     <a id="LoginLink"><%= image_tag('generic_login_32x32.png') %></a>
@@ -5,48 +6,11 @@
     <a id="LoginLinkTW"><%= image_tag('twitter_32x32.png') %></a>
   </div>
 
-  <%# TODO user name doesn't show up once logged in unless refresh again %>
+
   <div id="AuthBar_Out" class="<%= current_user() ? "visible" : "hidden" %>">
     <a id="LogoutLink" href="/auth/logout">Logout</a>
 
   </div>
+=======
+>>>>>>> e489ad39fdde0d6de2c50808a29e1a9fd17fa96f
 
-</div>
-
-<div id="jbhnm-signing-identity" title="Sign In" class="hidden">
-  <div id="jbhnm-signing-identity-message" class="hidden">
-  </div>
-
-  <div id="jbhnm-signing-identity-form">
-    <form>
-      <fieldset>
-        <label for="email">Email</label>
-        <input type="text" name="auth_key" id="auth_key" value="" class="text ui-widget-content ui-corner-all" />
-        <label for="password">Password</label>
-        <input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all" />
-      </fieldset>
-    </form>
-
-    <span style="font-size:8pt">Not a registered user? <a id="RegisterLink">Sign up here...</a></span>
-  </div>
-</div>
-
-<div id="jbhnm-register-identity" title="Register..." class="hidden">
-  <div id="jbhnm-register-identity-message" class="hidden">
-  </div>
-
-  <div id="jbhnm-register-identity-form">
-    <form method='post'>
-      <label for='name'>Name:</label>
-      <input type='text' id='name' name='name'/>
-      <label for='email_register'>Email:</label>
-      <input type='text' id='email_register' name='email_register'/>
-      <label for='password_register'>Password:</label>
-      <input type='password' id='password_register' name='password_register'/>
-      <label for='password_confirmation'>Confirm Password:</label>
-      <input type='password' id='password_confirmation' name='password_confirmation'/>
-    </form>
-  </div>
-</div>
-
-<hr />

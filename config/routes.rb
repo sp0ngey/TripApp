@@ -1,14 +1,27 @@
 TripApp::Application.routes.draw do
-  root :to => 'landing#index'
+  get "sessions/login"
+
+  get "session/login"
+
+  get "login/login"
+
+  get "login/login"
+
+  root :to => 'sessions#login'
 
   resources :trip_items
   resources :users
+  match "/trips/find", :controller => "trips", :action =>"find" # must be before resource :trips
   resources :trips
   resources :locations
 
   get "landing/index"
   get "landing/login"
   get "landing/browse"
+
+  match "/sessions/logout" => "sessions#destroy"
+  match "/trips/create" => "trips#create"
+
 
   match "/auth/:provider/callback" => "sessions#create"
   match "/auth/failure" => "sessions#failure"
