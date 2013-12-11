@@ -1,5 +1,36 @@
 var _myTrips;
 
+function AppendTripTableRow(theTrip)
+{
+    console.log("Appending to table at index " + _myTrips.length + "...");
+    console.log(theTrip);
+
+    var tripsTable = $("#TripsTable");
+    var tripsTableBody = tripsTable.children("tbody");
+
+    var editImg = $('<img alt="Edit" src="/assets/edit-icon.png" width="25" height="25">');
+    var deleteImg = $('<img alt="Delete" src="/assets/delete-icon.png" width="25" height="25">');
+    var tblRow = $('<tr></tr>');
+    var titleTd = $('<td>'+ theTrip.name +'</td>');
+    var linkTd = $('<td></td>');
+    var editLink = $('<a href="#"></a>');
+    var deleteLink = $('<a href="#"></a>');
+
+    editLink.append(editImg);
+    editLink.attr("indx", _myTrips.length);
+    $(editLink).click( function() { InitTripDialog($(this).attr("indx"), "Edit").dialog("open"); } );
+    linkTd.append(editLink);
+
+    $(deleteLink).click( function() { alert("This doesn't work yet..."); } );
+    deleteLink.append(deleteImg);
+    linkTd.append(deleteLink);
+
+    tblRow.append(titleTd);
+    tblRow.append(linkTd);
+    tripsTableBody.append( tblRow );
+    _myTrips.push(theTrip);
+}
+
 function LoadTrips()
 {
     $.ajax({
@@ -13,33 +44,10 @@ function LoadTrips()
             var tripsTable = $("#TripsTable");
             var tripsTableBody = tripsTable.children("tbody");
 
-            // Store the returned data in the global variable `_myTrips` for use by this page's functions
-            // `_myTrips` is just a list of Trip objects as defined by the Trip table
-            _myTrips = data;
-
             // Empty the trips table to delete the "loading" message and paste in the actual trips
+            _myTrips = []; // Maybe better to use `A.length = 0;` - not sure - http://stackoverflow.com/questions/1232040/how-to-empty-an-array-in-javascript
             tripsTableBody.empty();
-            jQuery.each(_myTrips, function(index, value) {
-                var editImg = $('<img alt="Edit" src="/assets/edit-icon.png" width="25" height="25">');
-                var deleteImg = $('<img alt="Delete" src="/assets/delete-icon.png" width="25" height="25">');
-                var tblRow = $('<tr></tr>');
-                var titleTd = $('<td>'+ value.name +'</td>');
-                var linkTd = $('<td></td>');
-                var editLink = $('<a href="#"></a>');
-                var deleteLink = $('<a href="#"></a>');
-
-                editLink.append(editImg);
-                $(editLink).click( function() { alert("This doesn't work yet..."); InitTripDialog(index, "Edit").dialog("open"); } );
-                linkTd.append(editLink);
-
-                $(deleteLink).click( function() { alert("This doesn't work yet..."); } );
-                deleteLink.append(deleteImg);
-                linkTd.append(deleteLink);
-
-                tblRow.append(titleTd);
-                tblRow.append(linkTd);
-                tripsTableBody.append( tblRow );
-            });
+            jQuery.each(data, function(index, tripObject) { AppendTripTableRow(tripObject); });
         },
         error: function(jqXHR, status, error) {
             tripsTableBody.empty();
@@ -109,6 +117,8 @@ function InitTripDialog(ref, command)
                     success: function(data) {
                         console.log("Success adding or editing trip...");
                         console.log(data);
+                        AppendTripTableRow(data);
+                        $("#TripDialog").dialog("destroy");
                     },
                     error: function(jqXHR, status, error) {
                         console.log("status: " + status + "\nerror: " + error);
