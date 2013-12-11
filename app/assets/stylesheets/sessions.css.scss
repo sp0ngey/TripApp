@@ -1,3 +1,37 @@
-// Place all the styles related to the sessions controller here.
-// They will automatically be included in application.css.
-// You can use Sass (SCSS) here: http://sass-lang.com/
+@import "common";
+
+#welcomeContainer
+{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: table;
+}
+
+#welcomeContainer div div
+{
+  border: 3px solid gray;
+  width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  @include borderRadius(5px);
+  @include shadow(5px, 5px, 2px, 2px, #CCC);
+  display: inline-block;
+}
+
+#welcomeContainer div
+{
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  width: 100%;
+}
+
+
+div#jbhnm-signing-identity label, input { display:block; }
+div#jbhnm-signing-identity fieldset { padding:0; border:0; margin-top:25px; }
+
+.errorMsg { border: 1px solid red; background-color: darksalmon; }
+.infoMsg  { border: 1px solid gray; background-color: wheat; }

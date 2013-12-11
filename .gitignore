@@ -7,9 +7,13 @@
 # Ignore bundler config
 /.bundle
 /.idea
+/.idea/*
 # Ignore the default SQLite database.
 /db/*.sqlite3
 
 # Ignore all logfiles and tempfiles.
 /log/*.log
 /tmp
+*.swp
+*~
+.gitignore.*

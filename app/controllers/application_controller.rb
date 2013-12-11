@@ -5,6 +5,9 @@ class ApplicationController < ActionController::Base
   #
   # Helper method to make the application variable @current_user available in a more friendly fashion.
   def current_user
+
+    logger.debug "DBG> Checking session " + session.inspect
+
     if session[:user_id]
       begin
         @current_user ||= User.find(session[:user_id])
