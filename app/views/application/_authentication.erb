@@ -4,8 +4,11 @@
     <a id="LoginLinkFB" href="/auth/facebook"><%= image_tag('facebook_32x32.png') %></a>
     <a id="LoginLinkTW"><%= image_tag('twitter_32x32.png') %></a>
   </div>
+
+  <%# TODO user name doesn't show up once logged in unless refresh again %>
   <div id="AuthBar_Out" class="<%= current_user() ? "visible" : "hidden" %>">
     <a id="LogoutLink" href="/auth/logout">Logout</a>
+
   </div>
 
 </div>
