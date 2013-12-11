@@ -85,6 +85,33 @@ function InitTripDialog(ref, command)
         width: 350,
         modal: true,
         draggable: false,
+        open: function() {
+            var messageDiv =  $('#TripDialogMessage');
+            var tripFormDiv =  $('#TripDialogForm');
+            var tripForm = tripFormDiv.children('form');
+
+            tripForm.children().each(
+                function(indx, el) {
+                    var me = $(this);
+                    var myTagName = me.prop('tagName');
+                    if( myTagName == "INPUT" || myTagName == "TEXTAREA" )
+                    {
+                        if( isAnEdit )
+                        {
+                            var myInputName = me.attr('name');
+                            if( myInputName == "name" )
+                            {
+                                me.val(_myTrips[ref].name)
+                            }
+                            else if ( myInputName == "description" )
+                            {
+                                me.val(_myTrips[ref].description)
+                            }
+                        }
+                        else { me.val(""); }
+                    }
+                } );
+        },
         buttons: {
             "Do it!": function() {
                 var jsonObj = {};
