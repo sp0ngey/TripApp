@@ -21,6 +21,15 @@ class TripsController < ApplicationController
     end
   end
 
+  # GET /trips/showByUser.json
+  def find
+    @trips = Trip.find_all_by_user_id(params[:user_id])
+
+    respond_to do |format|
+      format.json { render json: @trips }
+    end
+  end
+
   # GET /trips/new
   # GET /trips/new.json
   def new

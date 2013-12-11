@@ -11,6 +11,7 @@ TripApp::Application.routes.draw do
 
   resources :trip_items
   resources :users
+  match "/trips/find", :controller => "trips", :action =>"find" # must be before resource :trips
   resources :trips
   resources :locations
 
@@ -20,6 +21,7 @@ TripApp::Application.routes.draw do
 
   match "/sessions/logout" => "sessions#destroy"
   match "/trips/create" => "trips#create"
+
 
   match "/auth/:provider/callback" => "sessions#create"
   match "/auth/failure" => "sessions#failure"
