@@ -12,7 +12,7 @@
 
       <div id="YourTrips">
         <p> These are your trips: </p>
-        <table id="TripsTable">
+        <table id="TripsTable" style="border: 1px solid black; width:100%;">
           <thead>
             <tr>
               <th>Trip</th>
@@ -110,6 +110,8 @@
         <%= text_field_tag(:name) %>
         <%= label_tag(:description, 'Description:') %>
         <%= text_area_tag(:description, "", size: "40x10") %>
+        <%= check_box_tag(:published) %>
+        <%= label_tag(:published, "Published?") %>
         <%= hidden_field_tag 'user_id', @currentUser.id %>
     <% end %>
   </div>

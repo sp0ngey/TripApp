@@ -15,7 +15,6 @@ function AppendTripTableRow(theTrip)
     var linkTd = $('<td></td>');
     var editLink = $('<a href="#"></a>');
     var deleteLink = $('<a href="#"></a>');
-
     editLink.append(editImg);
     editLink.attr("indx", _myTrips.length);
     $(editLink).click( function() { InitTripDialog($(this).attr("indx"), "Edit").dialog("open"); } );
@@ -122,7 +121,6 @@ function InitTripDialog(ref, command)
     if( isAnEdit )
     {
         dialogTitle = "Edit the trip " + _myTrips[ref].name + "(" + _myTrips[ref].id + ")";
-
     }
     else
     {
@@ -149,17 +147,18 @@ function InitTripDialog(ref, command)
                     {
                         if( isAnEdit )
                         {
-                            var myInputName = me.attr('name');
-                            if( myInputName == "name" )              { me.val(_myTrips[ref].name) }
-                            else if ( myInputName == "description" ) { me.val(_myTrips[ref].description) }
+                            $("#name").val(_myTrips[ref].name);
+                            $("#description").val(_myTrips[ref].description);
+                            $("#published").prop("checked", _myTrips[ref].published);
                         }
                         else
                         {
-                            var myInputName = me.attr('type');
-                            if( myInputName != "hidden" ) { me.val("") }
+                            $("#name").val("");
+                            $("#description").val("");
+                            $("#published").prop("checked", false);
                         }
                     }
-                } );
+                });
         },
         buttons: {
             "Do it...": function() {
@@ -168,25 +167,11 @@ function InitTripDialog(ref, command)
                 var tripFormDiv =  $('#TripDialogForm');
                 var tripForm = tripFormDiv.children('form');
 
-                tripForm.children().each(
-                    function(indx, el) {
-                        var me = $(this);
-                        var myTagName = me.prop('tagName');
-                        if( myTagName == "INPUT" || myTagName == "TEXTAREA" )
-                        {
-                            var name = "trip[" + me.attr('name') + "]";
-                            jsonObj[name] = me.val();
-                        }
-                        else if( myTagName == "HIDDEN" )
-                        {
-                            jsonObj[me.attr('name')] = me.val();
-                        }
-                    } );
-
-                if( isAnEdit )
-                {
-                    jsonObj["_method"] = "put";
-                }
+                jsonObj["trip[user_id]"]     = $("#user_id").val();
+                jsonObj["trip[name]"]        = $("#name").val();
+                jsonObj["trip[description]"] = $("#description").val();
+                jsonObj["trip[published]"]   = $("#published").prop("checked");
+                jsonObj["_method"]           = isAnEdit ? "put" : "post";
 
                 $.ajax({
                     type: 'post',
@@ -197,13 +182,17 @@ function InitTripDialog(ref, command)
                     dataType: 'json',
                     success: function(data) {
                         console.log("Success " + (isAnEdit ? "editing" : "creating") + " trip...");
-                        console.log(data);
                         if( isAnEdit )
                         {
                             _myTrips[ref].name = jsonObj["trip[name]"];
                             _myTrips[ref].description = jsonObj["trip[description]"];
+                            _myTrips[ref].published = jsonObj["trip[published]"];
                         }
-                        else { AppendTripTableRow(data); }
+                        else
+                        {
+                            AppendTripTableRow(data);
+                        }
+
                         $("#TripDialog").dialog("destroy");
                     },
                     error: function(jqXHR, status, error) {
