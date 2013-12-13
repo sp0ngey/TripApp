@@ -1,4 +1,4 @@
-var _myTrips;
+var _myTrips = [];
 
 function AppendTripTableRow(theTrip)
 {
@@ -29,6 +29,8 @@ function AppendTripTableRow(theTrip)
     tblRow.append(titleTd);
     tblRow.append(linkTd);
     tripsTableBody.append( tblRow );
+
+    theTrip['tblRow'] = tblRow;
     _myTrips.push(theTrip);
 }
 
@@ -44,6 +46,9 @@ function LoadTrips()
         success: function(data) {
             var tripsTable = $("#TripsTable");
             var tripsTableBody = tripsTable.children("tbody");
+
+            console.log("LOAD TRIPTS SUCCESS");
+            console.log(data);
 
             // Empty the trips table to delete the "loading" message and paste in the actual trips
             _myTrips = []; // Maybe better to use `A.length = 0;` - not sure - http://stackoverflow.com/questions/1232040/how-to-empty-an-array-in-javascript
@@ -81,6 +86,9 @@ function InitDeleteTripDialog(indx)
                         console.log("Success deleting trip...");
                         console.log(data);
 
+                        // The trip has been deleted on the server side so lets remove it from the list on the
+                        // web page client side
+                        _myTrips[indx]['tblRow'].remove();
                         $("#DeleteTripDialog").dialog("destroy");
                     },
                     error: function(jqXHR, status, error) {
@@ -145,7 +153,11 @@ function InitTripDialog(ref, command)
                             if( myInputName == "name" )              { me.val(_myTrips[ref].name) }
                             else if ( myInputName == "description" ) { me.val(_myTrips[ref].description) }
                         }
-                        else { me.val(""); }
+                        else
+                        {
+                            var myInputName = me.attr('type');
+                            if( myInputName != "hidden" ) { me.val("") }
+                        }
                     }
                 } );
         },
@@ -184,7 +196,7 @@ function InitTripDialog(ref, command)
                     contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
                     dataType: 'json',
                     success: function(data) {
-                        console.log("Success adding or editing trip...");
+                        console.log("Success " + (isAnEdit ? "editing" : "creating") + " trip...");
                         console.log(data);
                         if( isAnEdit )
                         {
