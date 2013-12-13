@@ -1,5 +1,17 @@
 var _myTrips = [];
 
+function CreateTripActionImageLink(operation, callback)
+{
+    var theLink = $('<a href="#"></a>');
+    var theImg  = $('<img alt="' + operation + '" src="/assets/' + operation + '-icon.png" width="25" height="25">');
+
+    theLink.attr("indx", _myTrips.length);
+    theLink.click(callback);
+    theLink.append(theImg);
+
+    return theLink;
+}
+
 function AppendTripTableRow(theTrip)
 {
     console.log("Appending to table at index " + _myTrips.length + "...");
@@ -7,23 +19,13 @@ function AppendTripTableRow(theTrip)
 
     var tripsTable = $("#TripsTable");
     var tripsTableBody = tripsTable.children("tbody");
-
-    var editImg = $('<img alt="Edit" src="/assets/edit-icon.png" width="25" height="25">');
-    var deleteImg = $('<img alt="Delete" src="/assets/delete-icon.png" width="25" height="25">');
     var tblRow = $('<tr></tr>');
     var titleTd = $('<td>'+ theTrip.name +'</td>');
     var linkTd = $('<td></td>');
-    var editLink = $('<a href="#"></a>');
-    var deleteLink = $('<a href="#"></a>');
-    editLink.append(editImg);
-    editLink.attr("indx", _myTrips.length);
-    $(editLink).click( function() { InitTripDialog($(this).attr("indx"), "Edit").dialog("open"); } );
-    linkTd.append(editLink);
 
-    deleteLink.attr("indx", _myTrips.length);
-    $(deleteLink).click( function() { InitDeleteTripDialog($(this).attr("indx")).dialog("open"); } );
-    deleteLink.append(deleteImg);
-    linkTd.append(deleteLink);
+    linkTd.append( CreateTripActionImageLink("edit", function() { InitTripDialog($(this).attr("indx"), "Edit").dialog("open"); }) );
+    linkTd.append( CreateTripActionImageLink("view", function() { alert("TODO"); }) );
+    linkTd.append( CreateTripActionImageLink("delete", function() { InitDeleteTripDialog($(this).attr("indx")).dialog("open"); }) );
 
     tblRow.append(titleTd);
     tblRow.append(linkTd);
