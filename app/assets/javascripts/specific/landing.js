@@ -24,7 +24,7 @@ function AppendTripTableRow(theTrip)
     var linkTd = $('<td></td>');
 
     linkTd.append( CreateTripActionImageLink("edit", function() { InitTripDialog($(this).attr("indx"), "Edit").dialog("open"); }) );
-    linkTd.append( CreateTripActionImageLink("view", function() { window.location = "/trip/" + theTrip.id }) );
+    linkTd.append( CreateTripActionImageLink("view", function() { window.location = "/trips/" + theTrip.id }) );
     linkTd.append( CreateTripActionImageLink("delete", function() { InitDeleteTripDialog($(this).attr("indx")).dialog("open"); }) );
 
     tblRow.append(titleTd);

@@ -1,3 +1,24 @@
 // Place all the styles related to the Trips controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+#sortable { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+#sortable li { position: relative;  margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; overflow: auto}
+#sortable li:hover { background: yellow; }
+
+html, body, #map-canvas {
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+}
+
+#map-canvas {
+  display: block;
+  width: 500px;
+  height: 500px;
+}
+
+#panel {
+  background-color: #fff;
+  padding: 5px;
+  border: 1px solid #999;
+}

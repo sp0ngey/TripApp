@@ -12,7 +12,7 @@
 //
 //= require underscore
 //= require gmaps/google
-//= require_tree .
+//= require_tree ./shared
 
 //from http://excid3.com/blog/rails-tip-2-include-csrf-token-with-every-ajax-request/#.UYeUFVoW1Sc
 $(document).ajaxSend(function(e, xhr, options) {

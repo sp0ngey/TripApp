@@ -1,40 +1,56 @@
-<p id="notice"><%= notice %></p>
+<h1> Trip: </h1>
+<div style="width: 200px;">
+    <p>
+      <b>Name:</b>
+      <%= @trip.name %>
+    </p>
 
-<p>
-  <b>Name:</b>
-  <%= @trip.name %>
-</p>
+    <p>
+      <b>Description:</b>
+      <%= @trip.description %>
+    </p>
 
-<p>
-  <b>Description:</b>
-  <%= @trip.description %>
-</p>
+    <p>
+      <b>Up vote:</b>
+      <%= @trip.up_vote %>
+    </p>
 
-<p>
-  <b>Up vote:</b>
-  <%= @trip.up_vote %>
-</p>
+    <p>
+      <b>Down vote:</b>
+      <%= @trip.down_vote %>
+    </p>
 
-<p>
-  <b>Down vote:</b>
-  <%= @trip.down_vote %>
-</p>
+    <p>
+      <b>Published:</b>
+      <%= @trip.published %>
+    </p>
 
-<p>
-  <b>Published:</b>
-  <%= @trip.published %>
-</p>
+    <p>
+      <b>My trip:</b>
+      <%= @trip.my_trip %>
+    </p>
 
-<p>
-  <b>My trip:</b>
-  <%= @trip.my_trip %>
-</p>
+    <p>
+      <b>User:</b>
+      <%= @trip.user_id %>
+    </p>
 
-<p>
-  <b>User:</b>
-  <%= @trip.user_id %>
-</p>
+    <h2>Trip Items:</h2>
+    <% @trip_items.each do |thisTripItem| %>
+        <p><%= thisTripItem.description %></p>
+    <% end %>
+</div>
+<div id="panel">
+  <input id="address" type="textbox" value="">
+  <input type="button" value="Geocode" onclick="codeAddress()">
+</div>
 
+<div style="border: 1x solid magenta;">
+  <div id="map-canvas" style="width: 500px; float: left;"></div>
+  <div style="width: 700px; float: left;">
 
-<%= link_to 'Edit', edit_trip_path(@trip) %> |
-<%= link_to 'Back', trips_path %>
+    <ul id="sortable">
+    </ul>
+
+  </div>
+</div>
