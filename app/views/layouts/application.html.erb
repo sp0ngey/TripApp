@@ -19,7 +19,7 @@
 </head>
 <body>
 
-<% if params[:controller] != "sessions" && params[:controller] != "trips" %>
+<% if params[:controller] != "sessions" %>
 <!-- START: Header  --------------------------------------------------------------------------------------------------->
 <div class="header row">You are logged in as <%= current_user().name %>. Not you? <%= link_to "Logout...", :controller => :sessions, :action => :destroy %> </div>
 <!-- END: Header------------------------------------------------------------------------------------------------------->
