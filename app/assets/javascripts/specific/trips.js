@@ -130,7 +130,7 @@ function calcRoute()
     console.log("Calculating route...");
     if( markers.length <= 1 )
     {
-        console.log("There are 1 or zero markers available... not enought to plot a route!");
+        console.log("There are 1 or zero markers available... not enough to plot a route!");
         return;
     }
 
