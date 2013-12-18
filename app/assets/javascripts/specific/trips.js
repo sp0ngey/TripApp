@@ -60,7 +60,6 @@ function DeleteTripItem(theListItem)
     }
 
     theListItem.remove();
-    deletedObj.theMarker.setMap(null);
     deletedObj.theGeocodeResult = null;
     deletedObj.theListItem = null;
     calcRoute();
@@ -69,19 +68,7 @@ function DeleteTripItem(theListItem)
 function ClickTripItem(theListItem)
 {
     var itineryIndex = ConvertListItemItineryIdToInteger(theListItem.attr('id'));
-
     theListItem.children('div').slideToggle();
-
-
-    // nah! need to do this differently it doesn't work as I'd like it too
-    var marker = markers[itineryIndex].theMarker;
-    if (marker.getAnimation() != null)
-    {
-        marker.setAnimation(null);
-    } else
-    {
-        marker.setAnimation(google.maps.Animation.BOUNCE);
-    }
 }
 
 function codeAddress()
@@ -97,9 +84,6 @@ function codeAddress()
                 console.log("The results object from the geo code is as follows...");
                 console.log(results);
                 map.setCenter(results[0].geometry.location);
-                var marker = new google.maps.Marker({
-                    map: map,
-                    position: results[0].geometry.location });
 
                 var newDiv = $('<div style="display:none; border: 1px solid red; top: 0; left: 0;"></div>');
                 newDiv.append("This is an " + results[0].geometry.location_type + " location<br>Lat:" +  results[0].geometry.location.lat()+"<br>Lng:"+  results[0].geometry.location.lng());
@@ -115,7 +99,7 @@ function codeAddress()
                 newLi.click( function() { ClickTripItem($(this)); } );
 
                 $("#sortable").append(newLi);
-                markers.push({theMarker: marker, theGeocodeResult: results[0], theListItem: newLi});
+                markers.push({theGeocodeResult: results[0], theListItem: newLi});
                 calcRoute();
             }
             else
@@ -128,9 +112,11 @@ function codeAddress()
 function calcRoute()
 {
     console.log("Calculating route...");
-    if( markers.length <= 1 )
+    if( markers.length < 1 )
     {
-        console.log("There are 1 or zero markers available... not enough to plot a route!");
+        console.log("There are markers available... not enough to plot a route!");
+        directionsRenderer.setMap(null);
+        map.setZoom(0);
         return;
     }
 
@@ -147,22 +133,22 @@ function calcRoute()
      * on. The value of locationsInOrder[x] gives the index into the array markers[] which holds the marker that
      * corresponds to this itinery item. */
     var wayPoints = [];
-    var startMarker = markers[locationsInOrder[0]].theMarker;
-    var endMarker   = markers[locationsInOrder[locationsInOrder.length - 1]].theMarker;
-    console.log("   Starting at " + markers[locationsInOrder[0]].theGeocodeResult.formatted_address);
-    console.log("   Ending at " + markers[locationsInOrder[locationsInOrder.length - 1]].theGeocodeResult.formatted_address);
+    var startMarker = markers[locationsInOrder[0]];
+    var endMarker   = markers[locationsInOrder[locationsInOrder.length - 1]];
+    console.log("   Starting at " + startMarker.theGeocodeResult.formatted_address);
+    console.log("   Ending at " + endMarker.theGeocodeResult.formatted_address);
 
     for (var i = 1; i < locationsInOrder.length - 1; i++)
     {
         var locIndexIntoMarkers = locationsInOrder[i];
-        var thisMarker = markers[locIndexIntoMarkers].theMarker;
-        console.log("      Adding waypoint " + markers[locIndexIntoMarkers].theGeocodeResult.formatted_address);
-        wayPoints.push( {location: thisMarker.position, stopover: true} );
+        var thisMarker = markers[locIndexIntoMarkers];
+        console.log("      Adding waypoint " + thisMarker.theGeocodeResult.formatted_address);
+        wayPoints.push( {location: thisMarker.theGeocodeResult.geometry.location, stopover: true} );
     }
 
     var request = {
-        origin: startMarker.position,
-        destination: endMarker.position,
+        origin: startMarker.theGeocodeResult.geometry.location,
+        destination: endMarker.theGeocodeResult.geometry.location,
         waypoints: wayPoints,
         optimizeWaypoints: false,
         travelMode: google.maps.TravelMode.DRIVING
@@ -172,6 +158,7 @@ function calcRoute()
         if (status == google.maps.DirectionsStatus.OK)
         {
             directionsRenderer.setDirections(response);
+            directionsRenderer.setMap(map);
         }
         else
         {
