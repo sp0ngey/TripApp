@@ -86,7 +86,12 @@ function codeAddress()
                 map.setCenter(results[0].geometry.location);
 
                 var newDiv = $('<div style="display:none; border: 1px solid red; top: 0; left: 0;"></div>');
-                newDiv.append("This is an " + results[0].geometry.location_type + " location<br>Lat:" +  results[0].geometry.location.lat()+"<br>Lng:"+  results[0].geometry.location.lng());
+                var newForm = $('<form></form>');
+                var editorId = "ckeditor_" + markers.length;
+                var newEditor = $('<textarea id="editor_' + editorId + '"name="' + editorId + '">This is an ' + results[0].geometry.location_type + ' location<br>Lat:' +  results[0].geometry.location.lat()+'<br>Lng:'+  results[0].geometry.location.lng() + '</textarea>');
+                newDiv.append(newEditor);
+                console.log("Initialising CKEditor...");
+
 
                 var newSpan = $('<span style="position: absolute; right:0; margin-right: 10px;"></span>');
                 var newDeleteLink = $('<a href="#">Delete</a>');
@@ -101,6 +106,8 @@ function codeAddress()
                 $("#sortable").append(newLi);
                 markers.push({theGeocodeResult: results[0], theListItem: newLi});
                 calcRoute();
+
+                CKEDITOR.replace( editorId );
             }
             else
             {
@@ -114,7 +121,7 @@ function calcRoute()
     console.log("Calculating route...");
     if( markers.length < 1 )
     {
-        console.log("There are markers available... not enough to plot a route!");
+        console.log("There are no markers available... not enough to plot a route!");
         directionsRenderer.setMap(null);
         map.setZoom(0);
         return;
