@@ -8,38 +8,49 @@ var markers = [];
 var directionsRenderer;
 var directionsService;
 
-$(function() {
-    console.log("Initialising trips map stuff...");
-    $( "#sortable" ).sortable({
-        update: function( event, ui ) {  calcRoute(); }
-    });
-    $( "#sortable" ).disableSelection();
-    $( "#sortable" ).accordion();
+var dataTmpTODO;
 
-    geocoder = new google.maps.Geocoder();
-    directionsService = new google.maps.DirectionsService();
-    directionsRenderer = new google.maps.DirectionsRenderer();
-    var latlng = new google.maps.LatLng(50.816667, -1.083333);
-    var mapOptions = {
-        zoom: 8,
-        center: latlng
-    }
-    map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-    directionsRenderer.setMap(map);
+/*
+ * When the sortable LI is dragged the CKEditor goes a little bit whacky because the DOM structure is changed. The
+ * solution is to save the contents of the editor, destroy it, then when the drag finishes, re-create the editor and
+ * restore it's contents...
+ *
+ * See also SortableHasMovedSoRestoreCKEditorContent()
+ */
+function SortableIsMovingSoSaveCKEditorContent(ui)
+{
+    console.log(ui);
+    var sortableItem = $(ui.item[0]);
 
-    $('#address').val("portsmouth, uk");
-    codeAddress();
-    $('#address').val("plymouth, uk");
-    codeAddress();
-    $('#address').val("worcester, uk");
-    codeAddress();
-    $('#address').val("norwich, uk");
-    codeAddress();
-    $('#address').val("aberystwyth, uk");
-    codeAddress();
-    $('#address').val("blackpool, uk");
-    codeAddress();
-});
+    var itineryId = sortableItem.prop('id');
+
+    sortableItem.children('div').hide();
+    sortableItem.css('display', 'none');
+    sortableItem.css('offsetHeight');
+    sortableItem.css('display', 'block');
+
+    var editorId = "editor_" + itineryId + "_ckeditor";
+    var editor = CKEDITOR.instances[editorId];
+
+    dataTmpTODO = editor.getData();
+    editor.destroy();
+    console.log(dataTmpTODO);
+}
+
+/*
+ * See also SortableIsMovingSoSaveCKEditorContent()
+ */
+function SortableHasMovedSoRestoreCKEditorContent(ui)
+{
+    var sortableItem = $(ui.item[0]);
+
+    var itineryId = sortableItem.prop('id');
+    var editorId = "editor_" + itineryId + "_ckeditor";
+
+    var editor = CKEDITOR.replace(itineryId + "_ckeditor");
+    console.log($(itineryId + "_ckeditor"));
+    console.log(editor);
+}
 
 function ConvertListItemItineryIdToInteger(itineryItemIdString)
 {
@@ -67,8 +78,19 @@ function DeleteTripItem(theListItem)
 
 function ClickTripItem(theListItem)
 {
-    var itineryIndex = ConvertListItemItineryIdToInteger(theListItem.attr('id'));
-    theListItem.children('div').slideToggle();
+    theListItemEditorDiv = theListItem.children('div');
+    if( theListItemEditorDiv.is(":visible") )
+    {
+        console.log("Slide up");
+        theListItemEditorDiv.slideUp();
+        theListItem.draggable('enable');
+    }
+    else
+    {
+        console.log("Slide down");
+        theListItemEditorDiv.slideDown();
+        theListItem.draggable('disable');
+    }
 }
 
 function codeAddress()
@@ -85,28 +107,39 @@ function codeAddress()
                 console.log(results);
                 map.setCenter(results[0].geometry.location);
 
+                var itineryId ="itinery_item_" + markers.length;
+                var editorId = itineryId + "_ckeditor";
+
                 var newDiv = $('<div style="display:none; border: 1px solid red; top: 0; left: 0;"></div>');
                 var newForm = $('<form></form>');
-                var editorId = "ckeditor_" + markers.length;
                 var newEditor = $('<textarea id="editor_' + editorId + '"name="' + editorId + '">This is an ' + results[0].geometry.location_type + ' location<br>Lat:' +  results[0].geometry.location.lat()+'<br>Lng:'+  results[0].geometry.location.lng() + '</textarea>');
                 newDiv.append(newEditor);
                 console.log("Initialising CKEditor...");
 
+
+                var newLi = $('<li style="border: 2px solid blue;" id="itinery_item_' + markers.length + '">' + address + '</li>');
 
                 var newSpan = $('<span style="position: absolute; right:0; margin-right: 10px;"></span>');
                 var newDeleteLink = $('<a href="#">Delete</a>');
                 newDeleteLink.click( function() { DeleteTripItem($(this).parent().parent()); } );
                 newSpan.append(newDeleteLink);
 
-                var newLi = $('<li style="border: 2px solid blue;" id="itinery_item_' + markers.length + '">' + address + '</li>');
+                newSpan.append(" | ");
+
+                var newExpandLink = $('<a href="#">Expand</a>');
+                newExpandLink.click( function() { ClickTripItem(newLi); } );
+                newSpan.append(newExpandLink);
+
+
+
                 newLi.append(newSpan);
                 newLi.append(newDiv);
-                newLi.click( function() { ClickTripItem($(this)); } );
 
                 $("#sortable").append(newLi);
                 markers.push({theGeocodeResult: results[0], theListItem: newLi});
                 calcRoute();
 
+                console.log("Creating editor from textarea with id " + editorId);
                 CKEDITOR.replace( editorId );
             }
             else
@@ -173,3 +206,40 @@ function calcRoute()
         }
     });
 }
+
+$(function() {
+    console.log("Initialising trips map stuff...");
+    $( "#sortable" ).sortable({
+        containment: 'parent',
+        cursor: 'move',
+        start: function(event, ui) { console.log("Stating"); SortableIsMovingSoSaveCKEditorContent(ui); },
+        stop: function(event, ui) { console.log("Ending"); SortableHasMovedSoRestoreCKEditorContent(ui); },
+        update: function( event, ui ) {  calcRoute(); }
+    });
+    $( "#sortable" ).disableSelection();
+    $( "#sortable" ).accordion();
+
+    geocoder = new google.maps.Geocoder();
+    directionsService = new google.maps.DirectionsService();
+    directionsRenderer = new google.maps.DirectionsRenderer();
+    var latlng = new google.maps.LatLng(50.816667, -1.083333);
+    var mapOptions = {
+        zoom: 8,
+        center: latlng
+    }
+    map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+    directionsRenderer.setMap(map);
+
+    $('#address').val("portsmouth, uk");
+    codeAddress();
+    $('#address').val("plymouth, uk");
+    codeAddress();
+    $('#address').val("worcester, uk");
+    codeAddress();
+    $('#address').val("norwich, uk");
+    codeAddress();
+    $('#address').val("aberystwyth, uk");
+    codeAddress();
+    $('#address').val("blackpool, uk");
+    codeAddress();
+});
