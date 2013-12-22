@@ -113,7 +113,7 @@ function AddGeocodeLocationToTrip(theGeocodeResult)
     console.log("Initialising CKEditor...");
 
 
-    var newLi = $('<li style="border: 2px solid blue;" id="itinery_item_' + markers.length + '">' + theGeocodeResult.formatted_address + '</li>');
+    var newLi = $('<li id="itinery_item_' + markers.length + '">' + theGeocodeResult.formatted_address + '</li>');
 
     var legSpan = $('<span name="legInfo"></span>');
     legSpan.addClass("TripLegInfo");
@@ -197,7 +197,8 @@ function calcRoute()
     {
         markers[i].theListItem.children('span[name="legInfo"]').
             empty().
-            html('<img src="/assets/ajax-loader1.gif">');
+            html('<img src="/assets/ajax-loader1.gif">').
+            show();
     }
 
     /* The sortable object can return an ordered array or the sorted element id strings. Each string is of the form
@@ -258,7 +259,7 @@ function calcRoute()
                         var thisMarkerLi = markers[locIndexIntoMarkers].theListItem;
                         console.log(thisMarkerLi);
                         thisMarkerLi.children('span[name="legInfo"]').
-                            html("Distance = " + thisLeg.distance.text + " - Time = " + thisLeg.duration.text).
+                            html(thisLeg.distance.text + " ," + thisLeg.duration.text).
                             show();
                     }
                 }
