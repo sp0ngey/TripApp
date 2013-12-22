@@ -1,5 +1,6 @@
 var geocoder;
-var map;
+var map;          /*< This is the main map displayed to show the trip start/stop and waypoints...               */
+var selectionMap; /*< used when there is more than one result from the geocode. Only shown on the choice dialog */
 
 /* An array of markers on the google map. This array is in the order that the user created locations and doesn't
  * necessarily have the same order as the final result in the "sortable" itinery list. See the comments in codeAddress()
@@ -20,17 +21,20 @@ var dataTmpTODO;
 function SortableIsMovingSoSaveCKEditorContent(ui)
 {
     console.log(ui);
+
     var sortableItem = $(ui.item[0]);
-
     var itineryId = sortableItem.prop('id');
-
-    sortableItem.children('div').hide();
-    sortableItem.css('display', 'none');
-    sortableItem.css('offsetHeight');
-    sortableItem.css('display', 'block');
-
     var editorId = "editor_" + itineryId + "_ckeditor";
     var editor = CKEDITOR.instances[editorId];
+    var editorDiv = sortableItem.children('div');
+
+    console.log(sortableItem.parent());
+    console.log(sortableItem.position());
+
+    sortableItem.css('height', 'auto'); // Make sure it shrinks during dragging
+    editorDiv.slideUp(0, function() { console.log("Slide up finsihed"); });
+
+    console.log(sortableItem.position());
 
     dataTmpTODO = editor.getData();
     editor.destroy();
@@ -79,68 +83,93 @@ function DeleteTripItem(theListItem)
 function ClickTripItem(theListItem)
 {
     theListItemEditorDiv = theListItem.children('div');
+    console.log(theListItem.position());
+    console.log(theListItem.parent());
     if( theListItemEditorDiv.is(":visible") )
     {
         console.log("Slide up");
         theListItemEditorDiv.slideUp();
-        theListItem.draggable('enable');
+        //theListItem.draggable('enable');
     }
     else
     {
         console.log("Slide down");
         theListItemEditorDiv.slideDown();
-        theListItem.draggable('disable');
+        //theListItem.draggable('disable');
     }
 }
 
-function codeAddress()
+function AddGeocodeLocationToTrip(theGeocodeResult)
 {
+    map.setCenter(theGeocodeResult.geometry.location);
+
+    var itineryId ="itinery_item_" + markers.length;
+    var editorId = itineryId + "_ckeditor";
+
+    var newDiv = $('<div style="display:none; border: 1px solid red; top: 0; left: 0;"></div>');
+    var newForm = $('<form></form>');
+    var newEditor = $('<textarea id="editor_' + editorId + '"name="' + editorId + '">This is an ' + theGeocodeResult.geometry.location_type + ' location<br>Lat:' +  theGeocodeResult.geometry.location.lat()+'<br>Lng:'+  theGeocodeResult.geometry.location.lng() + '</textarea>');
+    newDiv.append(newEditor);
+    console.log("Initialising CKEditor...");
+
+
+    var newLi = $('<li style="border: 2px solid blue;" id="itinery_item_' + markers.length + '">' + theGeocodeResult.formatted_address + '</li>');
+
+    var newSpan = $('<span style="position: absolute; right:0; margin-right: 10px;"></span>');
+    var newDeleteLink = $('<a href="#">Delete</a>');
+    newDeleteLink.click( function() { DeleteTripItem($(this).parent().parent()); } );
+    newSpan.append(newDeleteLink);
+
+    newSpan.append(" | ");
+
+    var newExpandLink = $('<a href="#">Expand</a>');
+    newExpandLink.click( function() { ClickTripItem(newLi); } );
+    newSpan.append(newExpandLink);
+
+    newLi.append(newSpan);
+    newLi.append(newDiv);
+
+    $("#sortable").append(newLi);
+    markers.push({theGeocodeResult: theGeocodeResult, theListItem: newLi});
+    calcRoute();
+
+    console.log("Creating editor from textarea with id " + editorId);
+    CKEDITOR.replace( editorId );
+}
+
+function DoLocationGeocode()
+{
+    var searchButton = $('#SearchButton');
+    searchButton.attr("disabled", "disabled");
+
+    var searchMsgSpan = $('#SearchingMessage');
+    searchMsgSpan.show();
+
     var address = $('#address').val();
     console.log("Coding address " + address);
     geocoder.geocode(
         { 'address': address },
         function(results, status)
         {
+            searchMsgSpan.hide();
+            searchButton.removeAttr("disabled");
             if (status == google.maps.GeocoderStatus.OK)
             {
                 console.log("The results object from the geo code is as follows...");
                 console.log(results);
-                map.setCenter(results[0].geometry.location);
 
-                var itineryId ="itinery_item_" + markers.length;
-                var editorId = itineryId + "_ckeditor";
-
-                var newDiv = $('<div style="display:none; border: 1px solid red; top: 0; left: 0;"></div>');
-                var newForm = $('<form></form>');
-                var newEditor = $('<textarea id="editor_' + editorId + '"name="' + editorId + '">This is an ' + results[0].geometry.location_type + ' location<br>Lat:' +  results[0].geometry.location.lat()+'<br>Lng:'+  results[0].geometry.location.lng() + '</textarea>');
-                newDiv.append(newEditor);
-                console.log("Initialising CKEditor...");
-
-
-                var newLi = $('<li style="border: 2px solid blue;" id="itinery_item_' + markers.length + '">' + address + '</li>');
-
-                var newSpan = $('<span style="position: absolute; right:0; margin-right: 10px;"></span>');
-                var newDeleteLink = $('<a href="#">Delete</a>');
-                newDeleteLink.click( function() { DeleteTripItem($(this).parent().parent()); } );
-                newSpan.append(newDeleteLink);
-
-                newSpan.append(" | ");
-
-                var newExpandLink = $('<a href="#">Expand</a>');
-                newExpandLink.click( function() { ClickTripItem(newLi); } );
-                newSpan.append(newExpandLink);
-
-
-
-                newLi.append(newSpan);
-                newLi.append(newDiv);
-
-                $("#sortable").append(newLi);
-                markers.push({theGeocodeResult: results[0], theListItem: newLi});
-                calcRoute();
-
-                console.log("Creating editor from textarea with id " + editorId);
-                CKEDITOR.replace( editorId );
+                if(results.length > 1 )
+                {
+                    CreateGeocodeResultsDialog(results).dialog("open");
+                }
+                else if(results.length == 1 )
+                {
+                    AddGeocodeLocationToTrip(results[0]);
+                }
+                else
+                {
+                    alert('Not found');
+                }
             }
             else
             {
@@ -202,9 +231,61 @@ function calcRoute()
         }
         else
         {
-            alert("FUCKERY");
+            alert("FUCKERY because " + status);
         }
     });
+}
+
+function CreateGeocodeResultsDialog(geocodeResults)
+{
+    console.log("Running CreateGeocodeResultsDialog()");
+    var tripDialogDiv = $( '#GeocodeResultsDialog');
+    tripDialogDiv.dialog({
+        title: "Multiple possibilities found...",
+        autoOpen: false,
+        width: 350,
+        modal: true,
+        draggable: false,
+        open: function() {
+            /* As the dialog is opened, clear any previous results choices and render new ones based on the
+             * possible choices from the returned geocode results for this search... */
+            console.log("Firing open event for choices dialog");
+             var choicesForm = $('#GeocodeResultsChoices');
+            choicesForm.empty();
+            for(var i = 0; i < geocodeResults.length; ++i)
+            {
+                var thisGeoChoice = geocodeResults[i];
+                var newChoice = $('<input type="radio" name="geoChoice" value="' + i + '">' + thisGeoChoice.formatted_address + '<br>');
+
+                choicesForm.append(newChoice);
+            }
+        },
+        buttons: {
+            "Add": function() {
+
+                var selectedRadio = $('input[name=geoChoice]:radio:checked');
+                var choiceIndex = parseInt(selectedRadio.val());
+
+                if( isNaN(choiceIndex) )
+                {
+                    alert("Error: The choice selection failed for an unknown reason");
+                }
+                else
+                {
+                    AddGeocodeLocationToTrip(geocodeResults[choiceIndex]);
+                }
+                $( this ).dialog( "destroy" );
+            },
+            Cancel: function() {
+                $( this ).dialog( "destroy" );
+            }
+        },
+        close: function() {
+            $( this ).dialog( "destroy" );
+        }
+    });
+
+    return tripDialogDiv;
 }
 
 $(function() {
@@ -212,12 +293,14 @@ $(function() {
     $( "#sortable" ).sortable({
         containment: 'parent',
         cursor: 'move',
-        start: function(event, ui) { console.log("Stating"); SortableIsMovingSoSaveCKEditorContent(ui); },
-        stop: function(event, ui) { console.log("Ending"); SortableHasMovedSoRestoreCKEditorContent(ui); },
-        update: function( event, ui ) {  calcRoute(); }
+        start:  function(event, ui) { SortableIsMovingSoSaveCKEditorContent(ui); },
+        stop:   function(event, ui) { SortableHasMovedSoRestoreCKEditorContent(ui); },
+        update: function(event, ui) { calcRoute(); }
     });
     $( "#sortable" ).disableSelection();
     $( "#sortable" ).accordion();
+
+    CreateGeocodeResultsDialog([]);
 
     geocoder = new google.maps.Geocoder();
     directionsService = new google.maps.DirectionsService();
@@ -230,16 +313,5 @@ $(function() {
     map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
     directionsRenderer.setMap(map);
 
-    $('#address').val("portsmouth, uk");
-    codeAddress();
-    $('#address').val("plymouth, uk");
-    codeAddress();
-    $('#address').val("worcester, uk");
-    codeAddress();
-    $('#address').val("norwich, uk");
-    codeAddress();
-    $('#address').val("aberystwyth, uk");
-    codeAddress();
-    $('#address').val("blackpool, uk");
-    codeAddress();
+    selectionMap = new google.maps.Map(document.getElementById('GeocodeResultsMap'));
 });

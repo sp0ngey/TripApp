@@ -43,13 +43,21 @@
 
 <div id="panel">
   <input id="address" type="textbox" value="">
-  <input type="button" value="Geocode" onclick="codeAddress()">
+  <input id="SearchButton" type="button" value="Search..." onclick="DoLocationGeocode()">
+  <span id="SearchingMessage" class="hidden"> <%= image_tag("ajax-loader1.gif") %> Searching... </span>
 </div>
 
 <div style="border: 1x solid magenta;">
   <div id="map-canvas" style="width: 500px; float: left;"></div>
   <div style="padding-left: 510px;">
     <ul id="sortable">
+    <!-- Javascript will insert items here -->
     </ul>
   </div>
+</div>
+
+<div id="GeocodeResultsDialog" class="hidden">
+  <div id="GeocodeResultsMap"></div>
+  <form id="GeocodeResultsChoices"></div>
+
 </div>
