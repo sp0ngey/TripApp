@@ -41,13 +41,17 @@
     <% end %>
 </div>
 
+<div>
+  <input id="TripSave" type="button" value="Save"/>
+</div>
+
 <div id="panel">
   <input id="address" type="textbox" value="">
   <input id="SearchButton" type="button" value="Search..." onclick="DoLocationGeocode()">
   <span id="SearchingMessage" class="hidden"> <%= image_tag("ajax-loader1.gif") %> Searching... </span>
 </div>
 
-<div style="border: 1x solid magenta;">
+<div style="border: 1px solid magenta;">
   <div id="map-canvas" style="width: 500px; float: left;"></div>
   <div style="padding-left: 510px;">
     <ul id="sortable">

@@ -119,6 +119,13 @@ function AddGeocodeLocationToTrip(theGeocodeResult)
     legSpan.addClass("TripLegInfo");
     newLi.append(legSpan);
 
+    var legDurationSpan = $('<span name="legDuration"></span>');
+    var legDurationForm = $('<form style="display:inline;"></form>');
+    var legDurationForm = $('<form style="display:inline;"></form>');
+    legDurationForm.append( $('<input type="text" size="2" style="display:inline;"><select><option value="days">Days</option><option value="Weeks">Wks</option></select>') );
+    legDurationSpan.append(legDurationForm);
+    newLi.append(legDurationSpan);
+
     var newSpan = $('<span style="position: absolute; right:0; margin-right: 10px;"></span>');
     var newDeleteLink = $('<a href="#">Delete</a>');
     newDeleteLink.click( function() { DeleteTripItem($(this).parent().parent()); } );
@@ -259,7 +266,7 @@ function calcRoute()
                         var thisMarkerLi = markers[locIndexIntoMarkers].theListItem;
                         console.log(thisMarkerLi);
                         thisMarkerLi.children('span[name="legInfo"]').
-                            html(thisLeg.distance.text + " ," + thisLeg.duration.text).
+                            html(thisLeg.distance.text + ", " + thisLeg.duration.text).
                             show();
                     }
                 }
@@ -324,6 +331,12 @@ function CreateGeocodeResultsDialog(geocodeResults)
     return tripDialogDiv;
 }
 
+function SaveTrip()
+{
+    console.log("Attempting to save trip!");
+
+}
+
 $(function() {
     console.log("Initialising trips map stuff...");
     $( "#sortable" ).sortable({
@@ -350,4 +363,21 @@ $(function() {
     directionsRenderer.setMap(map);
 
     selectionMap = new google.maps.Map(document.getElementById('GeocodeResultsMap'));
+
+    $('#TripSave').click ( function() { alert("Saving"); } );
+
+
+    var address = $('#address');
+    address.val("Portsmouth, uk");
+    DoLocationGeocode();
+    address.val("Southampton, uk");
+    DoLocationGeocode();
+    address.val("Northampton, uk");
+    DoLocationGeocode();
+    address.val("Manchester, uk");
+    DoLocationGeocode();
+    address.val("Glasgow, uk");
+    DoLocationGeocode();
+
+
 });

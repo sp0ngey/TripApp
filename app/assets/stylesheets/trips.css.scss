@@ -3,10 +3,21 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
 @import "common";
 
+#sortable {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
 
-#sortable { list-style-type: none; margin: 0; padding: 0; }
-#sortable li { position: relative;  margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; overflow: auto}
-#sortable li:hover { background: yellow; }
+#sortable li {
+  position: relative;
+  margin: 0 3px 3px 3px;
+  padding: 0.4em;
+  padding-left: 1.5em;
+  overflow: auto;
+  @include borderRadius(5px);
+  border: 1px solid darkgray;
+}
 
 html, body, #map-canvas {
   height: 100%;
@@ -27,15 +38,10 @@ html, body, #map-canvas {
 }
 
 .TripLegInfo {
-   border: 1px solid #696969;
+  border: 1px solid #696969;
   background-color: #d3d3d3;
   font-size: 8pt;
-  padding: 0 5px 0 5px;
+  padding: 2px 5px 2px 5px;
   margin-left: 10px;
   @include borderRadius(5px);
-}
-
-ul#sortable li {
-  @include borderRadius(5px);
-  border: 1px solid darkgray;
 }
