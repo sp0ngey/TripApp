@@ -115,6 +115,10 @@ function AddGeocodeLocationToTrip(theGeocodeResult)
 
     var newLi = $('<li style="border: 2px solid blue;" id="itinery_item_' + markers.length + '">' + theGeocodeResult.formatted_address + '</li>');
 
+    var legSpan = $('<span name="legInfo"></span>');
+    legSpan.addClass("TripLegInfo");
+    newLi.append(legSpan);
+
     var newSpan = $('<span style="position: absolute; right:0; margin-right: 10px;"></span>');
     var newDeleteLink = $('<a href="#">Delete</a>');
     newDeleteLink.click( function() { DeleteTripItem($(this).parent().parent()); } );
@@ -189,6 +193,13 @@ function calcRoute()
         return;
     }
 
+    for(var i = 0; i < markers.length; ++i)
+    {
+        markers[i].theListItem.children('span[name="legInfo"]').
+            empty().
+            html('<img src="/assets/ajax-loader1.gif">');
+    }
+
     /* The sortable object can return an ordered array or the sorted element id strings. Each string is of the form
      * "itinery_item_<num>" where <num> provides the index into the `markers[]` global array that corresponds to this
      *  element. Therefore go through the array and strip the prefix and parse the integer suffix to get an array of
@@ -228,6 +239,30 @@ function calcRoute()
         {
             directionsRenderer.setDirections(response);
             directionsRenderer.setMap(map);
+            console.log(response);
+
+            if( response.routes.length > 0 )
+            {
+                markers[locationsInOrder[0]].theListItem.children('span[name="legInfo"]').
+                    empty().
+                    hide();
+                if( markers.length > 1 )
+                {
+                    var routeLegs = response.routes[0].legs;
+                    for(var i = 0; i < routeLegs.length; ++i)
+                    {
+                        var thisLeg = routeLegs[i];
+                        console.log("Adding in information for leg from " +  thisLeg.start_address + " to " + thisLeg.end_address);
+
+                        var locIndexIntoMarkers = locationsInOrder[i+1]; // +1 coz start isn't a leg
+                        var thisMarkerLi = markers[locIndexIntoMarkers].theListItem;
+                        console.log(thisMarkerLi);
+                        thisMarkerLi.children('span[name="legInfo"]').
+                            html("Distance = " + thisLeg.distance.text + " - Time = " + thisLeg.duration.text).
+                            show();
+                    }
+                }
+            }
         }
         else
         {
