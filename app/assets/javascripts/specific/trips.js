@@ -20,40 +20,30 @@ var dataTmpTODO;
  */
 function SortableIsMovingSoSaveCKEditorContent(ui)
 {
-    console.log(ui);
+    var theLi = $(ui.item[0]);
+    var theMarker = markers[ ConvertListItemItineryIdToInteger(theLi.prop('id')) ];
 
-    var sortableItem = $(ui.item[0]);
-    var itineryId = sortableItem.prop('id');
-    var editorId = "editor_" + itineryId + "_ckeditor";
-    var editor = CKEDITOR.instances[editorId];
-    var editorDiv = sortableItem.children('div');
+    // Make sure the div shrinks during dragging and shrink IMMEDIATELY
+    theLi.css('height', 'auto');
+    theLi.children('div').slideUp(0, function() { console.log("Slide up finsihed"); });
 
-    console.log(sortableItem.parent());
-    console.log(sortableItem.position());
-
-    sortableItem.css('height', 'auto'); // Make sure it shrinks during dragging
-    editorDiv.slideUp(0, function() { console.log("Slide up finsihed"); });
-
-    console.log(sortableItem.position());
-
-    dataTmpTODO = editor.getData();
-    editor.destroy();
-    console.log(dataTmpTODO);
+    // Save this ckeditor's data in a temporary stash and then destroy it so it can be recreated when the
+    // sorting dragging operation finishes
+    theMarker.ckEditDataStore = theMarker.ckEditInst.getData();
+    theMarker.ckEditInst.destroy();
+    theMarker.ckEditInst = null;
 }
 
-/*
- * See also SortableIsMovingSoSaveCKEditorContent()
- */
 function SortableHasMovedSoRestoreCKEditorContent(ui)
 {
-    var sortableItem = $(ui.item[0]);
+    var theLi = $(ui.item[0]);
+    var theMarker = markers[ ConvertListItemItineryIdToInteger(theLi.prop('id')) ];
 
-    var itineryId = sortableItem.prop('id');
-    var editorId = "editor_" + itineryId + "_ckeditor";
-
-    var editor = CKEDITOR.replace(itineryId + "_ckeditor");
-    console.log($(itineryId + "_ckeditor"));
-    console.log(editor);
+    // Re-create the ckeditor from the textarea placeholder and re-add the data we previously stashed in
+    // SortableIsMovingSoSaveCKEditorContent()
+    theMarker.ckEditInst = CKEDITOR.replace(theLi.find('textarea').get(0));
+    theMarker.ckEditInst.setData(theMarker.ckEditDataStore);
+    theMarker.ckEditDataStore = null;
 }
 
 function ConvertListItemItineryIdToInteger(itineryItemIdString)
@@ -63,112 +53,76 @@ function ConvertListItemItineryIdToInteger(itineryItemIdString)
 
 function DeleteTripItem(theListItem)
 {
-    console.log("Deleting trip item");
-    var itineryIndex = ConvertListItemItineryIdToInteger(theListItem.attr('id'));
+    //
+    // Get the index for this LI into the markers[] array
+    theListItemID = theListItem.prop('id');
+    var itineryIndex = ConvertListItemItineryIdToInteger(theListItemID);
 
-    var deletedObj = markers.splice(itineryIndex,1)[0];
-    console.log(deletedObj);
+    //
+    // Remove this item from the markers[] array and shrink the array. As everything after this element shifts down
+    // one array position, the corresponding LI ID must be relabelled to give the new array index...
+    var deletedObj = markers.splice(itineryIndex, 1)[0];
     for( var i = itineryIndex; i < markers.length; ++i )
     {
-        console.log("Relabelling " + markers[i].theListItem.attr('id') + " to " + 'itinery_item_' + i);
-        markers[i].theListItem.attr('id', 'itinery_item_' + i);
+        markers[i].theListItem.prop('id', 'itinery_item_' + i);
     }
 
     //
-    // The list item is about to be removed. Destroy the CKEditor instance to free up all its resources
-    var itineryId = theListItem.prop('id');
-    var editorId = "editor_" + itineryId + "_ckeditor";
-    var editor = CKEDITOR.instances[editorId];
-    console.log("Destroying the CKEDitor instance " + editorId);
-    editor.destroy();
-
-    //
-    // Destroy the date picker objects
-    theListItem.find("input").each( function(index, el) {
-        console.log("Destroying datepicker");
-        $(this).datepicker("destroy");
-    });
+    // The list item is about to be removed. Destroy the CKEditor instance and date pickers to free up all
+    // their resources
+    deletedObj.ckEditInst.destroy();
+    deletedObj.startDatePick.datepicker("destroy");
+    deletedObj.endDatePick.datepicker("destroy");
 
     //
     // Destory the list item and in markers[] null out all references for garbage collection
     theListItem.remove();
     deletedObj.theGeocodeResult = null;
-    deletedObj.theListItem = null;
+    deletedObj.theListItem      = null;
+    deletedObj.ckEditInst       = null;
+    deletedObj.ckEditDataStore  = null;
+    deletedObj.startDatePick    = null;
+    deletedObj.endDatePick      = null;
+
+    //
+    // Update the map to remove this deleted item...
     calcRoute();
 }
 
 function ClickTripItem(theListItem)
 {
     theListItemEditorDiv = theListItem.children('div');
-    console.log(theListItem.position());
-    console.log(theListItem.parent());
     if( theListItemEditorDiv.is(":visible") )
     {
-        console.log("Slide up");
         theListItemEditorDiv.slideUp();
         //theListItem.draggable('enable');
     }
     else
     {
-        console.log("Slide down");
         theListItemEditorDiv.slideDown();
         //theListItem.draggable('disable');
     }
 }
 
-/*
-function AddGeocodeLocationToTrip(theGeocodeResult)
-{
-    // Create some ID strings that will be assigned to elements of the cloned LI so that they can be referenced
-    // more readily later...
-    var itineryId ="itinery_item_" + markers.length;
-    var editorId = itineryId + "_ckeditor";
-
-    // Clone the template list item and set its unique identifier...
-    var newLi = $('#ItineryItemTemplate').clone();
-    newLi.prop('id', itineryId);
-
-    // Now set ID's for other important elements to make later lookup easier...
-    var liChildren = newLi.children();
-    for( var i=0; i < liChildren.length; ++i )
-    {
-        var thisChild = liChildren[i];
-        var thisChildTagName = thisChild.prop("tagName");
-        var thisChildClass   = thisChild.attr("class");
-        if( thisChildTagName == "SPAN")
-        {
-            switch( thisChildClass )
-            {
-                case "ItineryTitleText":
-                    break;
-                case "ItineryLegInfo":
-                    break;
-                case "ItineryLegTiming":
-                    break;
-                case "ItineryLinks":
-                    break;
-            }
-        }
-        else if( thisChildTagName == "DIV")
-        {
-        }
-    }
-
-}
-*/
 
 function TripItemDatesChanged(dateText, objInstance)
 {
+    console.log("TripItemsDatesChanged");
     // Navigate up to the containing span so that we can access the date of both date pickers...
     var datesSpan = $(objInstance.input[0]).parent("span");
     var listItem  = datesSpan.parent("li");
     if (typeof datesSpan === "undefined" || typeof listItem === "undefined") {
+        console.log("ERROR: Could not find the parent SPAN");
         return;
     }
 
     // Save a reference to each date picker...
     var datePickersArray = datesSpan.find('input');
     if( datePickersArray.length < 2 ) {
+        console.log("ERROR: Could not find two datepickers");
+        console.log(objInstance);
+        console.log(datesSpan);
+        console.log(datePickersArray);
         return;
     }
 
@@ -197,6 +151,8 @@ function TripItemDatesChanged(dateText, objInstance)
         return;
     }
 
+    console.log("Start: " + startDate);
+    console.log("End:   " + endDate);
     if( startDate >= endDate )
     {
         console.log("ERROR: The start date must be before the end date!");
@@ -244,8 +200,8 @@ function AddGeocodeLocationToTrip(theGeocodeResult)
     // Create the text area that will be used by CKEditor. Append to div
     // theGeocodeResult.geometry.location.lat()
     // theGeocodeResult.geometry.location.lng()
-    var newEditor = $('<textarea id="editor_' + editorId + '"name="' + editorId + '"></textarea>');
-    newDiv.append(newEditor);
+    var newEditorTextArea = $('<textarea id="editor_' + editorId + '"name="' + editorId + '"></textarea>');
+    newDiv.append(newEditorTextArea);
     console.log("Initialising CKEditor...");
     // ----- END EXPANDABLE DIV CREATION
 
@@ -290,14 +246,21 @@ function AddGeocodeLocationToTrip(theGeocodeResult)
     $("#sortable").append(newLi);
 
     //
-    // Shove the geocode result and a stash reference to the list item in the markers array
-    markers.push({theGeocodeResult: theGeocodeResult, theListItem: newLi});
-    calcRoute();
-
-    //
     // Finally, now that the text area exists in the body of the page it can be initialised by CKEditor functions...
     console.log("Creating editor from textarea with id " + editorId);
-    CKEDITOR.replace( editorId );
+    var newEditorInstance = CKEDITOR.replace( newEditorTextArea.get(0) );
+
+    //
+    // Shove the geocode result and a stash reference to the list item in the markers array
+    markers.push({
+        theGeocodeResult: theGeocodeResult,
+        theListItem: newLi,
+        ckEditInst: newEditorInstance,
+        ckEditDataStore: null,
+        startDatePick: startDate,
+        endDatePick: endDate});
+
+    calcRoute();
 }
 
 
