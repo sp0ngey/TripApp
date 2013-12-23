@@ -74,6 +74,23 @@ function DeleteTripItem(theListItem)
         markers[i].theListItem.attr('id', 'itinery_item_' + i);
     }
 
+    //
+    // The list item is about to be removed. Destroy the CKEditor instance to free up all its resources
+    var itineryId = theListItem.prop('id');
+    var editorId = "editor_" + itineryId + "_ckeditor";
+    var editor = CKEDITOR.instances[editorId];
+    console.log("Destroying the CKEDitor instance " + editorId);
+    editor.destroy();
+
+    //
+    // Destroy the date picker objects
+    theListItem.find("input").each( function(index, el) {
+        console.log("Destroying datepicker");
+        $(this).datepicker("destroy");
+    });
+
+    //
+    // Destory the list item and in markers[] null out all references for garbage collection
     theListItem.remove();
     deletedObj.theGeocodeResult = null;
     deletedObj.theListItem = null;
