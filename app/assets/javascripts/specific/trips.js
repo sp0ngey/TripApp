@@ -99,6 +99,99 @@ function ClickTripItem(theListItem)
     }
 }
 
+/*
+function AddGeocodeLocationToTrip(theGeocodeResult)
+{
+    // Create some ID strings that will be assigned to elements of the cloned LI so that they can be referenced
+    // more readily later...
+    var itineryId ="itinery_item_" + markers.length;
+    var editorId = itineryId + "_ckeditor";
+
+    // Clone the template list item and set its unique identifier...
+    var newLi = $('#ItineryItemTemplate').clone();
+    newLi.prop('id', itineryId);
+
+    // Now set ID's for other important elements to make later lookup easier...
+    var liChildren = newLi.children();
+    for( var i=0; i < liChildren.length; ++i )
+    {
+        var thisChild = liChildren[i];
+        var thisChildTagName = thisChild.prop("tagName");
+        var thisChildClass   = thisChild.attr("class");
+        if( thisChildTagName == "SPAN")
+        {
+            switch( thisChildClass )
+            {
+                case "ItineryTitleText":
+                    break;
+                case "ItineryLegInfo":
+                    break;
+                case "ItineryLegTiming":
+                    break;
+                case "ItineryLinks":
+                    break;
+            }
+        }
+        else if( thisChildTagName == "DIV")
+        {
+        }
+    }
+
+}
+*/
+
+function TripItemDatesChanged(dateText, objInstance)
+{
+    // Navigate up to the containing span so that we can access the date of both date pickers...
+    var datesSpan = $(objInstance.input[0]).parent("span");
+    var listItem  = datesSpan.parent("li");
+    if (typeof datesSpan === "undefined" || typeof listItem === "undefined") {
+        return;
+    }
+
+    // Save a reference to each date picker...
+    var datePickersArray = datesSpan.find('input');
+    if( datePickersArray.length < 2 ) {
+        return;
+    }
+
+    var startDatePick = null;
+    var endDatePick = null;
+    if( $(datePickersArray[0]).attr('class').search('ItineryStartDate') >= 0 )
+    {
+        startDatePick = $(datePickersArray[0]);
+        endDatePick   = $(datePickersArray[1]);
+    }
+    else
+    {
+        startDatePick = $(datePickersArray[1]);
+        endDatePick   = $(datePickersArray[0]);
+    }
+
+    // Make sure the start date is before the end date
+    var startDate = startDatePick.datepicker( "getDate" );
+    var endDate   = endDatePick.datepicker( "getDate" );
+
+    // Get the difference between the dates and add the duration summary to the list item summary span...
+    console.log("Start date is " + startDate);
+    console.log("End date is " + endDate);
+
+    if( !startDate || !endDate ) {
+        return;
+    }
+
+    if( startDate >= endDate )
+    {
+        console.log("ERROR: The start date must be before the end date!");
+        listItem.css("background-color", "red");
+        return;
+    }
+    else
+    {
+        listItem.css("background-color", "white");
+    }
+}
+
 function AddGeocodeLocationToTrip(theGeocodeResult)
 {
     map.setCenter(theGeocodeResult.geometry.location);
@@ -106,26 +199,61 @@ function AddGeocodeLocationToTrip(theGeocodeResult)
     var itineryId ="itinery_item_" + markers.length;
     var editorId = itineryId + "_ckeditor";
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ----- START EXPANDABLE DIV CREATION
+    // Create the divider that will house all expandable content
     var newDiv = $('<div style="display:none; border: 1px solid red; top: 0; left: 0;"></div>');
-    var newForm = $('<form></form>');
-    var newEditor = $('<textarea id="editor_' + editorId + '"name="' + editorId + '">This is an ' + theGeocodeResult.geometry.location_type + ' location<br>Lat:' +  theGeocodeResult.geometry.location.lat()+'<br>Lng:'+  theGeocodeResult.geometry.location.lng() + '</textarea>');
+
+    //
+    // Create the date pickers and containing paragraphs and span. Append enclosing span to div
+    var datesSpan = $('<span></span>');
+    var startDate = $('<input type="text" size="30" style="display: inline;">');
+    var endDate = startDate.clone();
+    startDate.addClass('ItineryStartDate');
+    endDate.addClass('ItineryEndDate');
+    startDate.datepicker({ onClose: function(dateTxt, objInst) {TripItemDatesChanged(dateTxt, objInst);} });
+    endDate.datepicker({ onClose: function(dateTxt, objInst) {TripItemDatesChanged(dateTxt, objInst);} });
+
+    var startPar = $('<p>Start: </p>');
+    startPar.append(startDate);
+    var endPar = $('<p>End: </p>');
+    endPar.append(endDate);
+
+    datesSpan.append(startPar);
+    datesSpan.append(endPar);
+    newDiv.append(datesSpan);
+
+    //
+    // Create the text area that will be used by CKEditor. Append to div
+    // theGeocodeResult.geometry.location.lat()
+    // theGeocodeResult.geometry.location.lng()
+    var newEditor = $('<textarea id="editor_' + editorId + '"name="' + editorId + '"></textarea>');
     newDiv.append(newEditor);
     console.log("Initialising CKEditor...");
+    // ----- END EXPANDABLE DIV CREATION
 
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ----- START LIST ITEM CREATION
+    // The ID of the list is important because it will be used in the sortable UL which will be able to return an
+    // array of IDs in the order sorted by the user. We will use this array of IDs to figure out the order of trip
+    // items. The id is of the form `itinery_item_<num>` where <num> will be the index into markers[] for the info
+    // that corresponds to that LI.
     var newLi = $('<li id="itinery_item_' + markers.length + '">' + theGeocodeResult.formatted_address + '</li>');
 
+    //
+    // Create the trip leg information span that will hold ???
     var legSpan = $('<span name="legInfo"></span>');
-    legSpan.addClass("TripLegInfo");
+    legSpan.addClass("ItineryLegInfo");
     newLi.append(legSpan);
 
+    //
+    // Create the trip duration span that will hold the distance and time from the previous stop
     var legDurationSpan = $('<span name="legDuration"></span>');
-    var legDurationForm = $('<form style="display:inline;"></form>');
-    var legDurationForm = $('<form style="display:inline;"></form>');
-    legDurationForm.append( $('<input type="text" size="2" style="display:inline;"><select><option value="days">Days</option><option value="Weeks">Wks</option></select>') );
-    legDurationSpan.append(legDurationForm);
     newLi.append(legDurationSpan);
 
+    //
+    // Create a span to hold the delete/expand links for this LI to control the child DIV visibility
     var newSpan = $('<span style="position: absolute; right:0; margin-right: 10px;"></span>');
     var newDeleteLink = $('<a href="#">Delete</a>');
     newDeleteLink.click( function() { DeleteTripItem($(this).parent().parent()); } );
@@ -140,13 +268,21 @@ function AddGeocodeLocationToTrip(theGeocodeResult)
     newLi.append(newSpan);
     newLi.append(newDiv);
 
+    //
+    // Initialise the sortabl list
     $("#sortable").append(newLi);
+
+    //
+    // Shove the geocode result and a stash reference to the list item in the markers array
     markers.push({theGeocodeResult: theGeocodeResult, theListItem: newLi});
     calcRoute();
 
+    //
+    // Finally, now that the text area exists in the body of the page it can be initialised by CKEditor functions...
     console.log("Creating editor from textarea with id " + editorId);
     CKEDITOR.replace( editorId );
 }
+
 
 function DoLocationGeocode()
 {
@@ -159,7 +295,8 @@ function DoLocationGeocode()
     var address = $('#address').val();
     console.log("Coding address " + address);
     geocoder.geocode(
-        { 'address': address },
+        { 'address': address
+        },
         function(results, status)
         {
             searchMsgSpan.hide();
@@ -169,24 +306,27 @@ function DoLocationGeocode()
                 console.log("The results object from the geo code is as follows...");
                 console.log(results);
 
-                if(results.length > 1 )
-                {
-                    CreateGeocodeResultsDialog(results).dialog("open");
-                }
-                else if(results.length == 1 )
-                {
-                    AddGeocodeLocationToTrip(results[0]);
-                }
-                else
-                {
-                    alert('Not found');
-                }
+                if(results.length > 1 )       { CreateGeocodeResultsDialog(results).dialog("open"); }
+                else if(results.length == 1 ) { AddGeocodeLocationToTrip(results[0]); }
+                else                          { alert('Not found'); }
             }
             else
             {
                 alert('Geocode was not successful for the following reason: ' + status);
             }
         });
+}
+
+function GetLocationsInOrder()
+{
+    /* The sortable object can return an ordered array or the sorted element id strings. Each string is of the form
+     * `itinery_item_<num>` where <num> provides the index into the `markers[]` global array that corresponds to this
+     *  element. Therefore go through the array and strip the prefix and parse the integer suffix to get an array of
+     *  indicies into the `markers[]` global.... */
+    return jQuery.map(
+        $("#sortable").sortable("toArray"),
+        function(val, indx) { return ConvertListItemItineryIdToInteger(val); }
+    );
 }
 
 function calcRoute()
@@ -208,13 +348,8 @@ function calcRoute()
             show();
     }
 
-    /* The sortable object can return an ordered array or the sorted element id strings. Each string is of the form
-     * "itinery_item_<num>" where <num> provides the index into the `markers[]` global array that corresponds to this
-     *  element. Therefore go through the array and strip the prefix and parse the integer suffix to get an array of
-     *  indicies into the `markers[]` global.... */
-    var locationsInOrder = jQuery.map( $("#sortable").sortable("toArray"), function(val, indx) { return ConvertListItemItineryIdToInteger(val); } );
-    console.log("Locations in order are:");
-    console.log(locationsInOrder);
+
+    var locationsInOrder = GetLocationsInOrder();
 
     /* Begin to construct the route between all the itinery items. The item order is in the `locationsInOrder[]` array.
      * Therefore locationsInOrder[0] is the first itinery stop, locationsInOrder[1] is the second itinery stop and so
@@ -334,7 +469,14 @@ function CreateGeocodeResultsDialog(geocodeResults)
 function SaveTrip()
 {
     console.log("Attempting to save trip!");
+    var tripObj = [];
+    var locationsInOrder = GetLocationsInOrder();
 
+    for(var i = 0; i < locationsInOrder.length; ++i)
+    {
+        var thisMarker = markers[locationsInOrder[i]];
+        console.log(thisMarker);
+    }
 }
 
 $(function() {
@@ -364,7 +506,7 @@ $(function() {
 
     selectionMap = new google.maps.Map(document.getElementById('GeocodeResultsMap'));
 
-    $('#TripSave').click ( function() { alert("Saving"); } );
+    $('#TripSave').click ( function() { SaveTrip() } );
 
 
     var address = $('#address');
