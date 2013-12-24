@@ -143,6 +143,7 @@ function TripItemDatesChanged(dateText, objInstance)
     console.log("End date is " + endDate);
 
     if( !startDate || !endDate ) {
+        legInfoSpan.hide();
         return;
     }
 
@@ -154,7 +155,13 @@ function TripItemDatesChanged(dateText, objInstance)
     }
     else
     {
-        legInfoSpan.css("background-color", "lightgray").html("Date for x days").show();
+        var MILLISECONDS_PER_DAY = 1000 * 60 * 60 *24;
+        // Use UTC to make sure we don't cross dalylight saving time boundaries
+        // see http://stackoverflow.com/questions/3224834/get-difference-between-2-dates-in-javascript
+        var durationInMilliSeconds = Date.UTC(endDate.getFullYear(), endDate.getMonth(), endDate.getDate()) -
+                                     Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+        var durationInDays = Math.floor(durationInMilliSeconds / MILLISECONDS_PER_DAY);
+        legInfoSpan.css("background-color", "lightgray").html(durationInDays + " days").show();
     }
 }
 
@@ -184,9 +191,9 @@ function AddGeocodeLocationToTrip(theGeocodeResult)
         dateFormat: "d M, y",
         onClose: function(dateTxt, objInst) {TripItemDatesChanged(dateTxt, objInst);} });
 
-    var startPar = $('<p>Start: </p>');
+    var startPar = $('<p style="display:inline;">Start: </p>');
     startPar.append(startDate);
-    var endPar = $('<p>End: </p>');
+    var endPar = $('<p style="display:inline;">Leave: </p>');
     endPar.append(endDate);
 
     datesSpan.append(startPar);
@@ -447,23 +454,39 @@ function CreateGeocodeResultsDialog(geocodeResults)
 function SaveTrip()
 {
     console.log("Attempting to save trip!");
-    var tripObj = [];
+    var tripObj = { user_id: _myUserId, trip_id: _myTripId,  items: [], _method: "put" };
+    var tripJSONString = "";
     var locationsInOrder = GetLocationsInOrder();
 
     for(var i = 0; i < locationsInOrder.length; ++i)
     {
         var thisMarker = markers[locationsInOrder[i]];
-        tripObj.push({
+        tripObj.items.push({
             geocode: thisMarker.theGeocodeResult,
             tripItem: {
-                start: thisMarker.startDatePick.datepicker( "getDate" ),
+                start:   thisMarker.startDatePick.datepicker( "getDate" ),
                 end:   thisMarker.endDatePick.datepicker( "getDate" ),
                 descr: thisMarker.ckEditInst.getData()
             }
         });
     }
 
-    console.log(tripObj);
+    tripJSONString = JSON.stringify(tripObj);
+    console.log(tripJSONString);
+    $.ajax({
+        type: 'post',
+        url: '/trips/save',
+        async: false,
+        data: tripJSONString,
+        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+        dataType: 'json',
+        success: function(data) {
+            console.log("SAVE OK");
+        },
+        error: function(jqXHR, status, error) {
+            console.log("SAVE FAIL status: " + status + "\nerror: " + error);
+        }
+    });
 }
 
 $(function() {

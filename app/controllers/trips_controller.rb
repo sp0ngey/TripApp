@@ -22,12 +22,19 @@ class TripsController < ApplicationController
     end
   end
 
-  # GET /trips/showByUser.json
+  # GET /trips/find.json
   def find
     @trips = Trip.find_all_by_user_id(params[:user_id])
 
     respond_to do |format|
       format.json { render json: @trips }
+    end
+  end
+
+  # GET /trips/save.json
+  def save
+    respond_to do |format|
+      format.json { render json: nil }
     end
   end
 
