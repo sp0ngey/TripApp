@@ -111,10 +111,7 @@ function TripItemDatesChanged(dateText, objInstance)
     // Navigate up to the containing span so that we can access the date of both date pickers...
     var datesSpan = $(objInstance.input[0]).parents("span");
     var listItem  = datesSpan.parents("li");
-    if (typeof datesSpan === "undefined" || typeof listItem === "undefined") {
-        console.log("ERROR: Could not find the parent SPAN");
-        return;
-    }
+    var legInfoSpan = listItem.find(".ItineryLegInfo");
 
     // Save a reference to each date picker...
     var datePickersArray = datesSpan.find('input');
@@ -153,13 +150,11 @@ function TripItemDatesChanged(dateText, objInstance)
     console.log("End:   " + endDate);
     if( startDate >= endDate )
     {
-        console.log("ERROR: The start date must be before the end date!");
-        listItem.css("background-color", "red");
-        return;
+        legInfoSpan.css("background-color", "red").html("Dates invalid!").show();
     }
     else
     {
-        listItem.css("background-color", "white");
+        legInfoSpan.css("background-color", "lightgray").html("Date for x days").show();
     }
 }
 
@@ -173,17 +168,21 @@ function AddGeocodeLocationToTrip(theGeocodeResult)
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // ----- START EXPANDABLE DIV CREATION
     // Create the divider that will house all expandable content
-    var newDiv = $('<div style="display:none; border: 1px solid red; top: 0; left: 0;"></div>');
+    var newDiv = $('<div style="display:none; top: 0; left: 0;"></div>');
 
     //
     // Create the date pickers and containing paragraphs and span. Append enclosing span to div
     var datesSpan = $('<span></span>');
-    var startDate = $('<input type="text" size="30" style="display: inline;">');
+    var startDate = $('<input type="text" size="11" style="display: inline;">');
     var endDate = startDate.clone();
     startDate.addClass('ItineryStartDate');
     endDate.addClass('ItineryEndDate');
-    startDate.datepicker({ onClose: function(dateTxt, objInst) {TripItemDatesChanged(dateTxt, objInst);} });
-    endDate.datepicker({ onClose: function(dateTxt, objInst) {TripItemDatesChanged(dateTxt, objInst);} });
+    startDate.datepicker({
+        dateFormat: "d M, y",
+        onClose: function(dateTxt, objInst) {TripItemDatesChanged(dateTxt, objInst);} });
+    endDate.datepicker({
+        dateFormat: "d M, y",
+        onClose: function(dateTxt, objInst) {TripItemDatesChanged(dateTxt, objInst);} });
 
     var startPar = $('<p>Start: </p>');
     startPar.append(startDate);
@@ -216,11 +215,13 @@ function AddGeocodeLocationToTrip(theGeocodeResult)
     // Create the trip leg information span that will hold ???
     var legSpan = $('<span name="legInfo"></span>');
     legSpan.addClass("ItineryLegInfo");
+    legSpan.hide();
     newLi.append(legSpan);
 
     //
     // Create the trip duration span that will hold the distance and time from the previous stop
     var legDurationSpan = $('<span name="legDuration"></span>');
+    legDurationSpan.addClass("ItineryLegDuration");
     newLi.append(legDurationSpan);
 
     //
@@ -320,7 +321,7 @@ function UpdateMapRoute()
 
     for(var i = 0; i < markers.length; ++i)
     {
-        markers[i].theListItem.children('span[name="legInfo"]').
+        markers[i].theListItem.children('span[name="legDuration"]').
             empty().
             html('<img src="/assets/ajax-loader1.gif">').
             show();
@@ -364,7 +365,7 @@ function UpdateMapRoute()
 
             if( response.routes.length > 0 )
             {
-                markers[locationsInOrder[0]].theListItem.children('span[name="legInfo"]').
+                markers[locationsInOrder[0]].theListItem.children('span[name="legDuration"]').
                     empty().
                     hide();
                 if( markers.length > 1 )
@@ -378,7 +379,7 @@ function UpdateMapRoute()
                         var locIndexIntoMarkers = locationsInOrder[i+1]; // +1 coz start isn't a leg
                         var thisMarkerLi = markers[locIndexIntoMarkers].theListItem;
                         console.log(thisMarkerLi);
-                        thisMarkerLi.children('span[name="legInfo"]').
+                        thisMarkerLi.children('span[name="legDuration"]').
                             html(thisLeg.distance.text + ", " + thisLeg.duration.text).
                             show();
                     }
@@ -452,8 +453,17 @@ function SaveTrip()
     for(var i = 0; i < locationsInOrder.length; ++i)
     {
         var thisMarker = markers[locationsInOrder[i]];
-        console.log(thisMarker);
+        tripObj.push({
+            geocode: thisMarker.theGeocodeResult,
+            tripItem: {
+                start: thisMarker.startDatePick.datepicker( "getDate" ),
+                end:   thisMarker.endDatePick.datepicker( "getDate" ),
+                descr: thisMarker.ckEditInst.getData()
+            }
+        });
     }
+
+    console.log(tripObj);
 }
 
 $(function() {
