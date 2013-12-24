@@ -86,7 +86,7 @@ function DeleteTripItem(theListItem)
 
     //
     // Update the map to remove this deleted item...
-    calcRoute();
+    UpdateMapRoute();
 }
 
 function ClickTripItem(theListItem)
@@ -109,8 +109,8 @@ function TripItemDatesChanged(dateText, objInstance)
 {
     console.log("TripItemsDatesChanged");
     // Navigate up to the containing span so that we can access the date of both date pickers...
-    var datesSpan = $(objInstance.input[0]).parent("span");
-    var listItem  = datesSpan.parent("li");
+    var datesSpan = $(objInstance.input[0]).parents("span");
+    var listItem  = datesSpan.parents("li");
     if (typeof datesSpan === "undefined" || typeof listItem === "undefined") {
         console.log("ERROR: Could not find the parent SPAN");
         return;
@@ -120,9 +120,7 @@ function TripItemDatesChanged(dateText, objInstance)
     var datePickersArray = datesSpan.find('input');
     if( datePickersArray.length < 2 ) {
         console.log("ERROR: Could not find two datepickers");
-        console.log(objInstance);
-        console.log(datesSpan);
-        console.log(datePickersArray);
+        console.log("Object instance - "); console.log(objInstance);
         return;
     }
 
@@ -260,7 +258,7 @@ function AddGeocodeLocationToTrip(theGeocodeResult)
         startDatePick: startDate,
         endDatePick: endDate});
 
-    calcRoute();
+    UpdateMapRoute();
 }
 
 
@@ -309,7 +307,7 @@ function GetLocationsInOrder()
     );
 }
 
-function calcRoute()
+function UpdateMapRoute()
 {
     console.log("Calculating route...");
     if( markers.length < 1 )
@@ -420,7 +418,6 @@ function CreateGeocodeResultsDialog(geocodeResults)
         },
         buttons: {
             "Add": function() {
-
                 var selectedRadio = $('input[name=geoChoice]:radio:checked');
                 var choiceIndex = parseInt(selectedRadio.val());
 
@@ -466,7 +463,7 @@ $(function() {
         cursor: 'move',
         start:  function(event, ui) { SortableIsMovingSoSaveCKEditorContent(ui); },
         stop:   function(event, ui) { SortableHasMovedSoRestoreCKEditorContent(ui); },
-        update: function(event, ui) { calcRoute(); }
+        update: function(event, ui) { UpdateMapRoute(); }
     });
     $( "#sortable" ).disableSelection();
     $( "#sortable" ).accordion();
