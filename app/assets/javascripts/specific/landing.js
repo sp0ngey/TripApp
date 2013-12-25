@@ -38,7 +38,7 @@ function AppendTripTableRow(theTrip)
 function LoadTrips()
 {
     $.ajax({
-        type: 'post',
+        type: 'get',
         url: '/trips/find',
         data: { user_id: _myUserId },
         async: false,

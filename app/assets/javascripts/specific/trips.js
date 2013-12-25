@@ -175,7 +175,7 @@ function AddGeocodeLocationToTrip(theGeocodeResult)
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // ----- START EXPANDABLE DIV CREATION
     // Create the divider that will house all expandable content
-    var newDiv = $('<div style="display:none; top: 0; left: 0;"></div>');
+    var newDiv = $('<div style="display:none; top: 0; left: 0; margin-top: 10px;"></div>');
 
     //
     // Create the date pickers and containing paragraphs and span. Append enclosing span to div
