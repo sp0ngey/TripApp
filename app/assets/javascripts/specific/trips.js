@@ -454,7 +454,7 @@ function CreateGeocodeResultsDialog(geocodeResults)
 function SaveTrip()
 {
     console.log("Attempting to save trip!");
-    var tripObj = { user_id: _myUserId, trip_id: _myTripId,  items: [], _method: "put" };
+    var tripObj = { user_id: _myUserId, trip_id: _myTripId,  items: [] };
     var tripJSONString = "";
     var locationsInOrder = GetLocationsInOrder();
 
@@ -471,13 +471,11 @@ function SaveTrip()
         });
     }
 
-    tripJSONString = JSON.stringify(tripObj);
-    console.log(tripJSONString);
     $.ajax({
-        type: 'post',
+        type: 'post', // PUT via rails _method data item
         url: '/trips/save',
         async: false,
-        data: tripJSONString,
+        data: {tripData: JSON.stringify(tripObj), _method: "PUT"},
         contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
         dataType: 'json',
         success: function(data) {

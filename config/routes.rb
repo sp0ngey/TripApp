@@ -12,6 +12,7 @@ TripApp::Application.routes.draw do
   resources :trip_items
   resources :users
   match "/trips/find", :controller => "trips", :action =>"find" # must be before resource :trips
+  match "/trips/save", :controller => "trips", :action =>"save" # must be before resource :trips
   resources :trips
   resources :locations
 

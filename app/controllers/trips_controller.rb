@@ -1,3 +1,5 @@
+require 'pp'
+
 class TripsController < ApplicationController
   # GET /trips
   # GET /trips.json
@@ -48,8 +50,12 @@ class TripsController < ApplicationController
     end
   end
 
-  # GET /trips/save.json
+  # PUT /trips/save.json
   def save
+    @jsonInput = JSON.parse(params[:tripData])
+    dump = PP.pp(@jsonInput, "")
+    logger.debug "DBG> " + dump
+
     respond_to do |format|
       format.json { render json: nil }
     end
