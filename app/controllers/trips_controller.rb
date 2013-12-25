@@ -53,8 +53,41 @@ class TripsController < ApplicationController
   # PUT /trips/save.json
   def save
     @jsonInput = JSON.parse(params[:tripData])
-    dump = PP.pp(@jsonInput, "")
-    logger.debug "DBG> " + dump
+    logger.debug "DBG> The entire JSON data is... " + PP.pp(@jsonInput, "")
+
+    #
+    # Go through all the locations and if they do not exist in the database then create them. If they do exist
+    # then simply record their user id...
+    # TODO Can this really guarantee that the location hasn't been totally deleted however. Or perhaps we would say
+    # TODO that we never delete locations? But then what if the user is deleting a location because it is no longer
+    # TODO valid?! Looks like we do have to cater for deletion, so rather than the optimistic locking, should we
+    # TODO in fact be using pessemistic locking?!
+    @jsonInput["items"].each do |tripItem|
+        location = tripItem["geocode"]["location"]
+        fullAddress = tripItem["geocode"]["formatted_address"]
+        addrComponents = tripItem["geocode"]["address_components"]
+
+        locationRow = Location.find_by_latitude_and_longitude(location["lat"].to_f, location["lng"].to_f)
+        if locationRow.nil?
+            # Add this row to the location table
+            #t.string  "address"
+            #t.float   "longitude"
+            #t.float   "latitude"
+            #t.string  "city"
+            #t.string  "country"
+            #locationRow = Location.new(:address => fullAddress, :latitude => location["lat"].to_f, :longitude => locations["lng"].to_f )
+        end
+    end
+
+    #
+    # Now that we have all the location id's we can go about adding the trip item info for this trip. The update
+    # operation will be pretty simple... we'll just delete all previous items and write in these new ones!
+    # TODO I currently assume non-currenent write access for a trip as only one use should own it. Is this a good
+    # TODO assumption or should I detect multiple accesses as a form of possible hacking, for example? Seems like
+    # TODO such a detection would be very poor as collision is very unlikely so it's probs useless!
+
+    #
+    # Having replaced all the trip items for this trip... we're done!
 
     respond_to do |format|
       format.json { render json: nil }
@@ -121,5 +154,11 @@ class TripsController < ApplicationController
       format.html { redirect_to trips_url }
       format.json { head :no_content }
     end
+  end
+
+protected
+
+  def getCountryFromGeocodeAddressComponents
+
   end
 end

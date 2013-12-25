@@ -462,7 +462,19 @@ function SaveTrip()
     {
         var thisMarker = markers[locationsInOrder[i]];
         tripObj.items.push({
-            geocode: thisMarker.theGeocodeResult,
+            geocode: {
+                // We won't just sent the geocode results as-are because the location components use variable names
+                // that are unspecified and CHANGE from time to time! The only good way to get them is to use the
+                // .lat() and .lng() functions. So I'll copy over the address components but the location stuff I'll
+                // use the API functions and create my own object with good names so the server can grab them
+                // reliably. Plus don't need to send the whole geometry structure...
+                // SEE: http://stackoverflow.com/questions/15395387/how-to-properly-use-google-maps-api
+                address_components: thisMarker.theGeocodeResult.address_components,
+                location: {
+                    lat: thisMarker.theGeocodeResult.geometry.location.lat(),
+                    lng: thisMarker.theGeocodeResult.geometry.location.lng()
+                }
+            },
             tripItem: {
                 start:   thisMarker.startDatePick.datepicker( "getDate" ),
                 end:   thisMarker.endDatePick.datepicker( "getDate" ),
