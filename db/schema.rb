@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131201212838) do
+ActiveRecord::Schema.define(:version => 20131225230141) do
 
   create_table "identities", :force => true do |t|
     t.string   "name"
@@ -22,11 +22,12 @@ ActiveRecord::Schema.define(:version => 20131201212838) do
   end
 
   create_table "locations", :force => true do |t|
-    t.string "address"
-    t.float  "longitude"
-    t.float  "latitude"
-    t.string "city"
-    t.string "country"
+    t.string  "address"
+    t.float   "longitude"
+    t.float   "latitude"
+    t.string  "city"
+    t.string  "country"
+    t.integer "lock_version", :default => 0
   end
 
   create_table "trip_items", :force => true do |t|
