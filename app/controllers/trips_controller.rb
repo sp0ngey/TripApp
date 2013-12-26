@@ -158,7 +158,13 @@ class TripsController < ApplicationController
 
 protected
 
-  def getCountryFromGeocodeAddressComponents
+  def getCountryFromGeocodeAddressComponents(addrComponents)
+    returnHash = {}
+    addrComponents.each do |component|
+      if !component["types"].index("country").nil?
+        returnHash[:country] = component["long_name"]
+      end
+    end
 
   end
 end

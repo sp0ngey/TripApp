@@ -24,8 +24,8 @@ function SortableIsMovingSoSaveCKEditorContent(ui)
     var theMarker = markers[ ConvertListItemItineryIdToInteger(theLi.prop('id')) ];
 
     // Make sure the div shrinks during dragging and shrink IMMEDIATELY
+    theLi.children('div').slideUp(1, function() { console.log("Slide up finsihed"); });
     theLi.css('height', 'auto');
-    theLi.children('div').slideUp(0, function() { console.log("Slide up finsihed"); });
 
     // Save this ckeditor's data in a temporary stash and then destroy it so it can be recreated when the
     // sorting dragging operation finishes
@@ -470,6 +470,7 @@ function SaveTrip()
                 // reliably. Plus don't need to send the whole geometry structure...
                 // SEE: http://stackoverflow.com/questions/15395387/how-to-properly-use-google-maps-api
                 address_components: thisMarker.theGeocodeResult.address_components,
+                formatted_address:  thisMarker.theGeocodeResult.formatted_address,
                 location: {
                     lat: thisMarker.theGeocodeResult.geometry.location.lat(),
                     lng: thisMarker.theGeocodeResult.geometry.location.lng()
@@ -502,7 +503,7 @@ function SaveTrip()
 $(function() {
     console.log("Initialising trips map stuff...");
     $( "#sortable" ).sortable({
-        containment: 'parent',
+        //containment: 'parent',
         cursor: 'move',
         start:  function(event, ui) { SortableIsMovingSoSaveCKEditorContent(ui); },
         stop:   function(event, ui) { SortableHasMovedSoRestoreCKEditorContent(ui); },
