@@ -1,9 +1,9 @@
 <script language="JavaScript">
-    var _myUserId = <%= current_user().id %>;
+    var _myUserId = <%= @currentUser.id %>;
 </script>
 
 <div style="float:left; height: 99%; width: 400px; margin-right: 10px; padding: 10px; border: 1px solid red;">
-    <h1>Hi <%= current_user().name %></h1>
+    <h1>Hi <%= @currentUser.name %></h1>
     <div id="tabs">
       <ul>
         <li><a href="#YourTrips">Your trips</a></li>
@@ -11,27 +11,24 @@
       </ul>
 
       <div id="YourTrips">
-        <% if @trips.nil? || @trips.length < 1 %>
-            You don't have any trips yet... better get planning!
-        <% else %>
-            <p> These are your trips: </p>
-            <table id="TripsTable">
-              <thead>
-                <tr>
-                  <th>Trip</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td colspan="2"> <%= image_tag("ajax-loader1.gif") %>Loading your trips...</td>
-                </tr>
-              </tbody>
-            </table>
-        <% end %>
-            <div>
-                <a href="#" id="NewTripLink">New</a>
-            </div>
+        <p> These are your trips: </p>
+        <table id="TripsTable" style="border: 1px solid black; width:100%;">
+          <thead>
+            <tr>
+              <th>Trip</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="2"> <%= image_tag("ajax-loader1.gif") %>Loading your trips...</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div>
+            <a href="#" id="NewTripLink">New</a>
+        </div>
       </div>
       <div id="YourBookmarks">
         Todo
@@ -39,7 +36,7 @@
     </div>
 </div>
 
-<div style="float:left; width: auto; padding: 10px; border: 1px solid blue;">
+<div style="clear: left; float:left; width: auto; padding: 10px; border: 1px solid blue;">
     <h1> Search for something...</h1>
     <%= form_tag({:controller => 'landing', :action => 'index'}, :method => 'get') do %>
         <%= label_tag(:location, 'Enter a Location:') %>
@@ -99,6 +96,10 @@
     </div>
 </div>
 
+<div id="DeleteTripDialog" title="Delete this trip?!" class="hidden">
+  <p>This trip will be permanently deleted and cannot be recovered. Are you sure?</p>
+</div>
+
 <div id="TripDialog" title="Create a new trip..." class="hidden">
   <div id="TripDialogMessage" class="hidden">
   </div>
@@ -109,7 +110,9 @@
         <%= text_field_tag(:name) %>
         <%= label_tag(:description, 'Description:') %>
         <%= text_area_tag(:description, "", size: "40x10") %>
-        <input name="user_id" type="hidden" value="<%= current_user().id %>" />
+        <%= check_box_tag(:published) %>
+        <%= label_tag(:published, "Published?") %>
+        <%= hidden_field_tag 'user_id', @currentUser.id %>
     <% end %>
   </div>
 </div>
@@ -122,6 +125,5 @@
         handler.fitMapToBounds();
 
     });
-
 </script>
 

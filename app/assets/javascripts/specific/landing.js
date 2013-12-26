@@ -1,4 +1,16 @@
-var _myTrips;
+var _myTrips = [];
+
+function CreateTripActionImageLink(operation, callback)
+{
+    var theLink = $('<a href="#"></a>');
+    var theImg  = $('<img alt="' + operation + '" src="/assets/' + operation + '-icon.png" width="25" height="25">');
+
+    theLink.attr("indx", _myTrips.length);
+    theLink.click(callback);
+    theLink.append(theImg);
+
+    return theLink;
+}
 
 function AppendTripTableRow(theTrip)
 {
@@ -7,42 +19,37 @@ function AppendTripTableRow(theTrip)
 
     var tripsTable = $("#TripsTable");
     var tripsTableBody = tripsTable.children("tbody");
-
-    var editImg = $('<img alt="Edit" src="/assets/edit-icon.png" width="25" height="25">');
-    var deleteImg = $('<img alt="Delete" src="/assets/delete-icon.png" width="25" height="25">');
     var tblRow = $('<tr></tr>');
     var titleTd = $('<td>'+ theTrip.name +'</td>');
     var linkTd = $('<td></td>');
-    var editLink = $('<a href="#"></a>');
-    var deleteLink = $('<a href="#"></a>');
 
-    editLink.append(editImg);
-    editLink.attr("indx", _myTrips.length);
-    $(editLink).click( function() { InitTripDialog($(this).attr("indx"), "Edit").dialog("open"); } );
-    linkTd.append(editLink);
-
-    $(deleteLink).click( function() { alert("This doesn't work yet..."); } );
-    deleteLink.append(deleteImg);
-    linkTd.append(deleteLink);
+    linkTd.append( CreateTripActionImageLink("edit", function() { InitTripDialog($(this).attr("indx"), "Edit").dialog("open"); }) );
+    linkTd.append( CreateTripActionImageLink("view", function() { window.location = "/trips/" + theTrip.id }) );
+    linkTd.append( CreateTripActionImageLink("delete", function() { InitDeleteTripDialog($(this).attr("indx")).dialog("open"); }) );
 
     tblRow.append(titleTd);
     tblRow.append(linkTd);
     tripsTableBody.append( tblRow );
+
+    theTrip['tblRow'] = tblRow;
     _myTrips.push(theTrip);
 }
 
 function LoadTrips()
 {
     $.ajax({
-        type: 'post',
+        type: 'get',
         url: '/trips/find',
-        data: { user_id: _myUserId},
+        data: { user_id: _myUserId },
         async: false,
         contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
         dataType: 'json',
         success: function(data) {
             var tripsTable = $("#TripsTable");
             var tripsTableBody = tripsTable.children("tbody");
+
+            console.log("LOAD TRIPTS SUCCESS");
+            console.log(data);
 
             // Empty the trips table to delete the "loading" message and paste in the actual trips
             _myTrips = []; // Maybe better to use `A.length = 0;` - not sure - http://stackoverflow.com/questions/1232040/how-to-empty-an-array-in-javascript
@@ -54,6 +61,51 @@ function LoadTrips()
             tripsTableBody.append( $('<tr><td colspan="2">Error loading your trip list!</td></tr>') );
         }
     });
+}
+
+function InitDeleteTripDialog(indx)
+{
+    console.log(indx);
+    var deleteTripDialogDiv =  $( "#DeleteTripDialog" );
+    deleteTripDialogDiv.dialog({
+        resizable: false,
+        height:175,
+        width:400,
+        modal: true,
+        title: "Really delete trip " + _myTrips[indx].name,
+        buttons: {
+            "Delete trip!": function() {
+                console.log("DELETE");
+                $.ajax({
+                    type: 'post',
+                    url: '/trips/' + _myTrips[indx].id,
+                    async: false,
+                    data: { _method : "delete" },
+                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                    dataType: 'json',
+                    success: function(data) {
+                        console.log("Success deleting trip...");
+                        console.log(data);
+
+                        // The trip has been deleted on the server side so lets remove it from the list on the
+                        // web page client side
+                        _myTrips[indx]['tblRow'].remove();
+                        $("#DeleteTripDialog").dialog("destroy");
+                    },
+                    error: function(jqXHR, status, error) {
+                        console.log("status: " + status + "\nerror: " + error);
+                    }
+                });
+
+                $( this ).dialog( "destroy" );
+            },
+            Cancel: function() {
+                $( this ).dialog( "destroy" );
+            }
+        }
+    });
+
+    return deleteTripDialogDiv;
 }
 
 function InitTripDialog(ref, command)
@@ -71,7 +123,6 @@ function InitTripDialog(ref, command)
     if( isAnEdit )
     {
         dialogTitle = "Edit the trip " + _myTrips[ref].name + "(" + _myTrips[ref].id + ")";
-
     }
     else
     {
@@ -98,13 +149,18 @@ function InitTripDialog(ref, command)
                     {
                         if( isAnEdit )
                         {
-                            var myInputName = me.attr('name');
-                            if( myInputName == "name" )              { me.val(_myTrips[ref].name) }
-                            else if ( myInputName == "description" ) { me.val(_myTrips[ref].description) }
+                            $("#name").val(_myTrips[ref].name);
+                            $("#description").val(_myTrips[ref].description);
+                            $("#published").prop("checked", _myTrips[ref].published);
                         }
-                        else { me.val(""); }
+                        else
+                        {
+                            $("#name").val("");
+                            $("#description").val("");
+                            $("#published").prop("checked", false);
+                        }
                     }
-                } );
+                });
         },
         buttons: {
             "Do it...": function() {
@@ -113,25 +169,11 @@ function InitTripDialog(ref, command)
                 var tripFormDiv =  $('#TripDialogForm');
                 var tripForm = tripFormDiv.children('form');
 
-                tripForm.children().each(
-                    function(indx, el) {
-                        var me = $(this);
-                        var myTagName = me.prop('tagName');
-                        if( myTagName == "INPUT" || myTagName == "TEXTAREA" )
-                        {
-                            var name = "trip[" + me.attr('name') + "]";
-                            jsonObj[name] = me.val();
-                        }
-                        else if( myTagName == "HIDDEN" )
-                        {
-                            jsonObj[me.attr('name')] = me.val();
-                        }
-                    } );
-
-                if( isAnEdit )
-                {
-                    jsonObj["_method"] = "put";
-                }
+                jsonObj["trip[user_id]"]     = $("#user_id").val();
+                jsonObj["trip[name]"]        = $("#name").val();
+                jsonObj["trip[description]"] = $("#description").val();
+                jsonObj["trip[published]"]   = $("#published").prop("checked");
+                jsonObj["_method"]           = isAnEdit ? "put" : "post";
 
                 $.ajax({
                     type: 'post',
@@ -141,14 +183,18 @@ function InitTripDialog(ref, command)
                     contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
                     dataType: 'json',
                     success: function(data) {
-                        console.log("Success adding or editing trip...");
-                        console.log(data);
+                        console.log("Success " + (isAnEdit ? "editing" : "creating") + " trip...");
                         if( isAnEdit )
                         {
                             _myTrips[ref].name = jsonObj["trip[name]"];
                             _myTrips[ref].description = jsonObj["trip[description]"];
+                            _myTrips[ref].published = jsonObj["trip[published]"];
                         }
-                        else { AppendTripTableRow(data); }
+                        else
+                        {
+                            AppendTripTableRow(data);
+                        }
+
                         $("#TripDialog").dialog("destroy");
                     },
                     error: function(jqXHR, status, error) {
@@ -169,6 +215,7 @@ function InitTripDialog(ref, command)
 
     return tripDialogDiv;
 }
+
 
 $(function() {
     console.log("Initialising the landing page...");

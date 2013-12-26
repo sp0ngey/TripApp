@@ -1,3 +1,47 @@
 // Place all the styles related to the Trips controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+@import "common";
+
+#sortable {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+#sortable li {
+  position: relative;
+  margin: 0 3px 3px 3px;
+  padding: 0.4em;
+  padding-left: 1.5em;
+  overflow: auto;
+  @include borderRadius(5px);
+  border: 1px solid darkgray;
+}
+
+html, body, #map-canvas {
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+}
+
+#map-canvas {
+  display: block;
+  width: 500px;
+  height: 500px;
+}
+
+#panel {
+  background-color: #fff;
+  padding: 5px;
+  border: 1px solid #999;
+}
+
+.ItineryLegInfo, .ItineryLegDuration {
+  border: 1px solid #696969;
+  background-color: #d3d3d3;
+  font-size: 8pt;
+  padding: 2px 5px 2px 5px;
+  margin-left: 10px;
+  @include borderRadius(5px);
+}

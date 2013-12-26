@@ -4,6 +4,7 @@ class LandingController < ApplicationController
   def index
     #Geocoder::Result::Google
 
+    @currentUser =  current_user();
     @trips = Trip.find_all_by_user_id( current_user().id )
     dump = PP.pp(@trips, "")
     logger.debug("DBG> Landing controller> " + dump);
