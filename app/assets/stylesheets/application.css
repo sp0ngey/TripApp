@@ -14,6 +14,7 @@
 .hidden {display: none; }
 
 
+
 .row, .col { overflow: hidden; position: absolute; }
 .row { left: 0; right: 0; }
 .col { top: 0; bottom: 0; }
@@ -21,9 +22,9 @@
 .scroll-y { overflow-y: auto; }
 
 .header.row {
-    min-height: 70px;
+    height: 30px;
     top: 0;
-    font-size: 7pt;
+    font-size: 10pt;
     color: #000000;
     background-color: cadetblue;
     border: 0px;
@@ -31,5 +32,8 @@
     text-align: left;
 }
 
+.body.row { top: 30px; bottom: 0px; padding: 10px 10px 0px 10px; }
 
-.body.row { top: 60px; bottom: 0px; padding: 10px 10px 0px 10px; }
+#BrowseTrips { float: right; }
+#BrowseTrips input { display: inline; }
+

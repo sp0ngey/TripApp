@@ -13,6 +13,18 @@
 
 ActiveRecord::Schema.define(:version => 20131228162343) do
 
+  create_table "countries", :force => true do |t|
+    t.string   "long_name"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  create_table "country_abbreviations", :force => true do |t|
+    t.string   "short_name"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
   create_table "identities", :force => true do |t|
     t.string   "name"
     t.string   "email"
@@ -22,12 +34,15 @@ ActiveRecord::Schema.define(:version => 20131228162343) do
   end
 
   create_table "locations", :force => true do |t|
-    t.string  "address"
     t.float   "longitude"
     t.float   "latitude"
-    t.string  "city"
     t.string  "country"
-    t.integer "lock_version", :default => 0
+    t.integer "lock_version",      :default => 0
+    t.string  "admin_area_1"
+    t.string  "admin_area_2"
+    t.string  "admin_area_3"
+    t.string  "formatted_address"
+    t.string  "locality"
     t.string  "country_name"
   end
 
