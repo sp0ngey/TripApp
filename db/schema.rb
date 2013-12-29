@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131227165213) do
+ActiveRecord::Schema.define(:version => 20131228162343) do
 
   create_table "countries", :force => true do |t|
     t.string   "long_name"
@@ -43,6 +43,7 @@ ActiveRecord::Schema.define(:version => 20131227165213) do
     t.string  "admin_area_3"
     t.string  "formatted_address"
     t.string  "locality"
+    t.string  "country_name"
   end
 
   create_table "trip_items", :force => true do |t|
