@@ -23,16 +23,14 @@
 <% if params[:controller] != "sessions" %>
 <!-- START: Header  --------------------------------------------------------------------------------------------------->
 <div class="header row">
-  <div id="header-info">You are logged in as <%= current_user().name %>. Not you? <%= link_to "Logout...", :controller => :sessions, :action => :destroy %></div>
-  <div id="header-info">
-      <div id="BrowseTrips" >
+  You are logged in as <%= current_user().name %>. Not you? <%= link_to "Logout...", :controller => :sessions, :action => :destroy %>
+      <div id="BrowseTrips" style="display: inline;" >
         <%= form_tag({:controller => 'trips', :action => 'index'}, :method => 'get') do %>
             <%= label_tag(:keyword, 'Browse all trips') %>
             <%= text_field_tag(:keyword) %>
             <%= submit_tag('Search', :name => nil)   %>
         <% end %>
       </div>
-  </div>
 </div>
 <!-- END: Header------------------------------------------------------------------------------------------------------->
 

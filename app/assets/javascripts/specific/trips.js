@@ -477,9 +477,9 @@ function SaveTrip()
                 }
             },
             tripItem: {
-                start:   thisMarker.startDatePick.datepicker( "getDate" ),
-                end:   thisMarker.endDatePick.datepicker( "getDate" ),
-                descr: thisMarker.ckEditInst.getData()
+                start:  thisMarker.startDatePick.datepicker( "getDate" ),
+                end:    thisMarker.endDatePick.datepicker( "getDate" ),
+                descr:  thisMarker.ckEditInst.getData()
             }
         });
     }
@@ -541,6 +541,4 @@ $(function() {
     DoLocationGeocode();
     address.val("Glasgow, uk");
     DoLocationGeocode();
-
-
 });
