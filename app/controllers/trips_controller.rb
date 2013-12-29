@@ -62,20 +62,28 @@ class TripsController < ApplicationController
     # TODO that we never delete locations? But then what if the user is deleting a location because it is no longer
     # TODO valid?! Looks like we do have to cater for deletion, so rather than the optimistic locking, should we
     # TODO in fact be using pessemistic locking?!
+    logger.debug "DBG> Searching for locations..."
     @jsonInput["items"].each do |tripItem|
         location = tripItem["geocode"]["location"]
         fullAddress = tripItem["geocode"]["formatted_address"]
-        addrComponents = tripItem["geocode"]["address_components"]
+        addrComponents = getComponentsFromGeocodeAddressComponents(tripItem["geocode"]["address_components"])
 
+        logger.debug "DBG> Searching for " + fullAddress + " at (" + location["lat"].to_s + ", " + location["lng"].to_s + ")"
         locationRow = Location.find_by_latitude_and_longitude(location["lat"].to_f, location["lng"].to_f)
         if locationRow.nil?
-            # Add this row to the location table
-            #t.string  "address"
-            #t.float   "longitude"
-            #t.float   "latitude"
-            #t.string  "city"
-            #t.string  "country"
-            #locationRow = Location.new(:address => fullAddress, :latitude => location["lat"].to_f, :longitude => locations["lng"].to_f )
+          logger.debug "DBG> Location not found, inserting it into the database..."
+          locationRow =
+              Location.create do |loc|
+                    loc.formatted_address = fullAddress
+                    loc.admin_area_1 = addrComponents[:admin_area_1]
+                    loc.admin_area_2 = addrComponents[:admin_area_2]
+                    loc.admin_area_3 = addrComponents[:admin_area_3]
+                    loc.country      = addrComponents[:country]
+                    loc.locality     = addrComponents[:locality]
+                    loc.longitude    = location["lng"].to_f
+                    loc.latitude     = location["lat"].to_f
+              end
+          logger.debug "DBG> Have created... " + PP.pp(locationRow, "")
         end
     end
 
@@ -158,13 +166,17 @@ class TripsController < ApplicationController
 
 protected
 
-  def getCountryFromGeocodeAddressComponents(addrComponents)
-    returnHash = {}
+  def getComponentsFromGeocodeAddressComponents(addrComponents)
+    returnHash = {:country => nil, :admin_area_1 => nil, :admin_area_2 => nil, :admin_area_3 => nil, :locality => nil}
+
     addrComponents.each do |component|
-      if !component["types"].index("country").nil?
-        returnHash[:country] = component["long_name"]
-      end
+      returnHash[:country]      = component["long_name"] if !component["types"].index("country").nil?
+      returnHash[:admin_area_1] = component["long_name"] if !component["types"].index("administrative_area_level_1").nil?
+      returnHash[:admin_area_2] = component["long_name"] if !component["types"].index("administrative_area_level_2").nil?
+      returnHash[:admin_area_3] = component["long_name"] if !component["types"].index("administrative_area_level_3").nil?
+      returnHash[:locality]     = component["long_name"] if !component["types"].index("locality").nil?
     end
 
+    return returnHash
   end
 end
