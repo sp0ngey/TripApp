@@ -4,12 +4,13 @@ class TripsController < ApplicationController
   # GET /trips
   # GET /trips.json
   def index
-    @trips = Trip.all
+    #@trips = Trip.all
+    @trips = Trip.search(params[:keyword])
 
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @trips }
-    end
+    #respond_to do |format|
+    #  format.html # index.html.erb
+    #  format.json { render json: @trips }
+    #end
   end
 
   # GET /trips/1
