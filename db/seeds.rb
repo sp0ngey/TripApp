@@ -1,0 +1,5 @@
+TripItem.create(name: 'Greek Experience', description: 'Main sites of Athens', start_date: Date.new(2010,7,15), end_date: Date.new(2010,7,18), trip_id: 5, location_id: 32)
+TripItem.create(name: 'Wait for Ferry', description: 'Ferry from Patra to Bari', start_date: Date.new(2010,7,19), end_date: Date.new(2010,7,19), trip_id: 5, location_id: 29)
+TripItem.create(name: 'First day in Italy', description: 'Arrival at Bari', start_date: Date.new(2010,7,20), end_date: Date.new(2010,7,20), trip_id: 5, location_id: 24)
+TripItem.create(name: 'Holy Place', description: 'Cathedral in Assisi', start_date: Date.new(2010,7,21), end_date: Date.new(2010,7,23), trip_id: 5, location_id: 30)
+TripItem.create(name: 'Final day in Italy', description: 'Pisa - leaning tower', start_date: Date.new(2010,7,24), end_date: Date.new(2010,7,26), trip_id: 5, location_id: 31)

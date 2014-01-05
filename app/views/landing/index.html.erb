@@ -1,6 +1,8 @@
 <script language="JavaScript">
     var _myUserId = <%= @currentUser.id %>;
+
 </script>
+
 
 
 <div style="float:left; height: 99%; width: 400px; margin-right: 10px; padding: 10px; border: 1px solid red;">
@@ -22,6 +24,7 @@
           </thead>
           <tbody>
             <tr>
+              <%# the list of user's trips are created in landing.js in LoadTrips()  %>
               <td colspan="2"> <%= image_tag("ajax-loader1.gif") %>Loading your trips...</td>
             </tr>
           </tbody>

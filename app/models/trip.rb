@@ -5,7 +5,9 @@ class Trip < ActiveRecord::Base
   def self.search(keyword)
     if keyword
 
-      find(:all, :joins => 'LEFT OUTER JOIN trip_items ON trips.id = trip_items.trip_id LEFT OUTER JOIN locations ON locations.id = trip_items.location_id',
+      find(:all, :joins => 'LEFT OUTER JOIN trip_items ON trips.id = trip_items.trip_id
+                            LEFT OUTER JOIN locations ON locations.id = trip_items.location_id',
+                 :group => 'trips.id',
                  :conditions => ['trips.name LIKE :keyword OR
                                   trip_items.name LIKE :keyword OR
                                   trips.description LIKE :keyword OR

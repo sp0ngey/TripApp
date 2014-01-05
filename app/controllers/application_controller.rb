@@ -2,6 +2,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
   helper_method :current_user
 
+
   #
   # Helper method to make the application variable @current_user available in a more friendly fashion.
   def current_user
@@ -23,3 +24,6 @@ class ApplicationController < ActionController::Base
     return @current_user
   end
 end
+
+
+

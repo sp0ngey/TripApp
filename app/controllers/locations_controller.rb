@@ -51,7 +51,7 @@ class LocationsController < ApplicationController
   # POST /locations.json
   def create
     @location = Location.new()
-#    @location.address = params[:address]
+    #@location.address = params[:address]
 
     respond_to do |format|
       if @location.save

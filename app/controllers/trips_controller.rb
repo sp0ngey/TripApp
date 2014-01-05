@@ -1,10 +1,13 @@
 require 'pp'
 
 class TripsController < ApplicationController
+
+
   # GET /trips
   # GET /trips.json
   def index
     #@trips = Trip.all
+    @currentUser =  current_user();
     @trips = Trip.search(params[:keyword])
 
     #respond_to do |format|
@@ -117,6 +120,15 @@ class TripsController < ApplicationController
   # GET /trips/1/edit
   def edit
     @trip = Trip.find(params[:id])
+
+    # stop users from editing a trip they don't have ownership
+    # TODO currently if user tries to edit someone else's trip, it will redirect them back to home page but AJAX message is probably better
+
+    unless session[:user_id] == @trip.user_id
+
+      redirect_to root_path
+      return
+    end
   end
 
   # POST /trips

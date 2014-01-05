@@ -34,16 +34,14 @@ ActiveRecord::Schema.define(:version => 20131228162343) do
   end
 
   create_table "locations", :force => true do |t|
+    t.string  "address"
     t.float   "longitude"
     t.float   "latitude"
+    t.string  "city"
     t.string  "country"
-    t.integer "lock_version",      :default => 0
-    t.string  "admin_area_1"
-    t.string  "admin_area_2"
-    t.string  "admin_area_3"
-    t.string  "formatted_address"
-    t.string  "locality"
+    t.integer "lock_version", :default => 0
     t.string  "country_name"
+    t.string  "locality"
   end
 
   create_table "trip_items", :force => true do |t|
