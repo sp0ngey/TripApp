@@ -20,7 +20,8 @@ class TripsController < ApplicationController
   # GET /trips/1.json
   def show
     @trip = Trip.find(params[:id])
-    @trip_items = TripItem.joins(:location).where("trip_items.trip_id" => params[:id])
+    @trip_items = TripItem.select("trip_items.*, locations.*").joins(:location).where("trip_items.trip_id" => params[:id]).order("start_date ASC")
+
 
     respond_to do |format|
       format.html # show.html.erb

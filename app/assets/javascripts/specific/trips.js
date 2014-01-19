@@ -24,7 +24,7 @@ function SortableIsMovingSoSaveCKEditorContent(ui)
     var theMarker = markers[ ConvertListItemItineryIdToInteger(theLi.prop('id')) ];
 
     // Make sure the div shrinks during dragging and shrink IMMEDIATELY
-    theLi.children('div').slideUp(1, function() { console.log("Slide up finsihed"); });
+    theLi.children('div').slideUp(1, function() { console.log("Slide up finished"); });
     theLi.css('height', 'auto');
 
     // Save this ckeditor's data in a temporary stash and then destroy it so it can be recreated when the
@@ -217,7 +217,8 @@ function AddGeocodeLocationToTrip(theGeocodeResult)
     // items. The id is of the form `itinery_item_<num>` where <num> will be the index into markers[] for the info
     // that corresponds to that LI.
     var newLi = $('<li id="itinery_item_' + markers.length + '">' + theGeocodeResult.formatted_address + '</li>');
-
+    //Added by SP: the class is used for disabling or enabling the sortable feature of the accordion
+    newLi.addClass("sortStatus");
     //
     // Create the trip leg information span that will hold ???
     var legSpan = $('<span name="legInfo"></span>');
@@ -233,18 +234,21 @@ function AddGeocodeLocationToTrip(theGeocodeResult)
 
     //
     // Create a span to hold the delete/expand links for this LI to control the child DIV visibility
-    var newSpan = $('<span style="position: absolute; right:0; margin-right: 10px;"></span>');
-    var newDeleteLink = $('<a href="#">Delete</a>');
-    newDeleteLink.click( function() { DeleteTripItem($(this).parent().parent()); } );
-    newSpan.append(newDeleteLink);
+    // Added by SP: if the trip owner is the same as the current user then he can see the 'delete' and 'expand' links.
+    if(_tripOwner == _myUserId) {
+        var newSpan = $('<span style="position: absolute; right:0; margin-right: 10px;"></span>');
+        var newDeleteLink = $('<a href="#">Delete</a>');
+        newDeleteLink.click( function() { DeleteTripItem($(this).parent().parent()); } );
+        newSpan.append(newDeleteLink);
 
-    newSpan.append(" | ");
+        newSpan.append(" | ");
 
-    var newExpandLink = $('<a href="#">Expand</a>');
-    newExpandLink.click( function() { ClickTripItem(newLi); } );
-    newSpan.append(newExpandLink);
+        var newExpandLink = $('<a href="#">Expand</a>');
+        newExpandLink.click( function() { ClickTripItem(newLi); } );
+        newSpan.append(newExpandLink);
 
-    newLi.append(newSpan);
+        newLi.append(newSpan);
+    }
     newLi.append(newDiv);
 
     //
@@ -502,13 +506,37 @@ function SaveTrip()
 
 $(function() {
     console.log("Initialising trips map stuff...");
-    $( "#sortable" ).sortable({
-        //containment: 'parent',
-        cursor: 'move',
-        start:  function(event, ui) { SortableIsMovingSoSaveCKEditorContent(ui); },
-        stop:   function(event, ui) { SortableHasMovedSoRestoreCKEditorContent(ui); },
-        update: function(event, ui) { UpdateMapRoute(); }
-    });
+
+    if(_tripOwner == _myUserId) {
+        console.log("trip owner == current user...");
+        $( "#sortable" ).sortable({
+            //containment: 'parent',
+
+            cursor: 'move',
+            start:  function(event, ui) { SortableIsMovingSoSaveCKEditorContent(ui); },
+            stop:   function(event, ui) { SortableHasMovedSoRestoreCKEditorContent(ui); },
+            update: function(event, ui) { UpdateMapRoute(); }
+
+        });
+    }
+    else {
+        console.log("trip owner != current user...");
+        $( "#sortable" ).sortable({
+            //containment: 'parent',
+            // TODO not working properly yet. Doesn't seem to load beyond the first location and also the distance stuff doesn't load.
+            //items: "li:not(.sortStatus)",
+            cursor: 'move',
+            //start:  function(event, ui) { SortableIsMovingSoSaveCKEditorContent(ui); },
+            //stop:   function(event, ui) { SortableHasMovedSoRestoreCKEditorContent(ui); },
+            update: function(event, ui) { UpdateMapRoute(); }
+
+        });
+    }
+
+
+
+
+
     $( "#sortable" ).disableSelection();
     $( "#sortable" ).accordion();
 
@@ -530,15 +558,22 @@ $(function() {
     $('#TripSave').click ( function() { SaveTrip() } );
 
 
+    // TODO why are the locations not ordered by start date like it's supposed to??? In fact, the order changes randomly on different occasions
+    var orderedTripLocationJSON = _tripLocationJSON;
+    //var orderedTripLocationJSON = [{"address":"Athens"},{"address":"Patra"}];
+    var orderedTripLocationJSONLength = orderedTripLocationJSON.length;
     var address = $('#address');
-    address.val("Portsmouth, uk");
-    DoLocationGeocode();
-    address.val("Southampton, uk");
-    DoLocationGeocode();
-    address.val("Northampton, uk");
-    DoLocationGeocode();
-    address.val("Manchester, uk");
-    DoLocationGeocode();
-    address.val("Glasgow, uk");
-    DoLocationGeocode();
+
+    console.log(_tripLocationJSON);
+
+    for (var i=0; i<orderedTripLocationJSONLength; ++i) {
+
+        //var objLocation = JSON.parse(orderedTripLocationJSON);
+        console.log("Adding trip location: " + orderedTripLocationJSON[i].address);
+        address.val(orderedTripLocationJSON[i].address);
+        DoLocationGeocode();
+
+    }
+
+
 });

@@ -1,11 +1,14 @@
 <script language="JavaScript">
     var _myUserId = <%= current_user().id %>;
+    var _tripOwner = <%= @trip.user_id %>;
     var _myTripId = <%= @trip.id %>
+    _tripLocationJSON = <%= raw @trip_items.to_json %>
 </script>
+
 
 <h1> Trip: </h1>
 <div style="width: 200px;">
-    <p>
+  <p>
       <b>Name:</b>
       <%= @trip.name %>
     </p>
@@ -42,19 +45,23 @@
 
     <h2>Trip Items:</h2>
     <% @trip_items.each do |thisTripItem| %>
-        <p><%= thisTripItem.description %></p>
+        <p><%= thisTripItem.address %></p>
     <% end %>
 </div>
 
-<div>
-  <input id="TripSave" type="button" value="Save"/>
-</div>
+<% if  current_user().id == @trip.user_id %>
+    <div>
+      <input id="TripSave" type="button" value="Save"/>
+    </div>
+<% end %>
+
 
 <div id="panel">
   <input id="address" type="textbox" value="">
   <input id="SearchButton" type="button" value="Search..." onclick="DoLocationGeocode()">
   <span id="SearchingMessage" class="hidden"> <%= image_tag("ajax-loader1.gif") %> Searching... </span>
 </div>
+
 
 <div>
   <div id="map-canvas" style="width: 500px; float: left;"></div>
