@@ -1,4 +1,6 @@
 TripApp::Application.routes.draw do
+  resources :photos
+
   get "sessions/login"
 
   get "session/login"

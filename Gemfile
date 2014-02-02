@@ -52,3 +52,4 @@ gem "koala", "~> 1.7.0rc1"
 # gem 'ruby-debug19', :require => 'ruby-debug'
 
 gem 'sanitize'
+gem 'paperclip'

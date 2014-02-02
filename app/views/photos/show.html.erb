@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Name:</b>
+  <%= @photo.image_file_name %>
+</p>
+
+<p>
+  <b>Trip item:</b>
+  <%= @photo.trip_item_id %>
+</p>
+
+<p>
+  <b>Image:</b>
+  <%= image_tag @photo.image.url( :medium ) %>
+</p>
+
+<%= link_to 'Edit', edit_photo_path(@photo) %> |
+<%= link_to 'Back', photos_path %>

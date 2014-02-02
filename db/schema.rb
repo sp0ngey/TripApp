@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131228162343) do
+ActiveRecord::Schema.define(:version => 20140202165200) do
 
   create_table "countries", :force => true do |t|
     t.string   "long_name"
@@ -42,6 +42,16 @@ ActiveRecord::Schema.define(:version => 20131228162343) do
     t.integer "lock_version", :default => 0
     t.string  "country_name"
     t.string  "locality"
+  end
+
+  create_table "photos", :force => true do |t|
+    t.integer  "trip_item_id"
+    t.datetime "created_at",         :null => false
+    t.datetime "updated_at",         :null => false
+    t.string   "image_file_name"
+    t.string   "image_content_type"
+    t.integer  "image_file_size"
+    t.datetime "image_updated_at"
   end
 
   create_table "trip_items", :force => true do |t|
