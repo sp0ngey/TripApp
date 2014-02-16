@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140202165200) do
+ActiveRecord::Schema.define(:version => 20140214090344) do
 
   create_table "countries", :force => true do |t|
     t.string   "long_name"
@@ -68,13 +68,13 @@ ActiveRecord::Schema.define(:version => 20140202165200) do
   create_table "trips", :force => true do |t|
     t.string   "name"
     t.text     "description"
-    t.integer  "up_vote"
-    t.integer  "down_vote"
+    t.integer  "up_vote",     :default => 0
+    t.integer  "down_vote",   :default => 0
     t.boolean  "published"
     t.boolean  "my_trip"
     t.integer  "user_id"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.datetime "created_at",                 :null => false
+    t.datetime "updated_at",                 :null => false
   end
 
   create_table "users", :force => true do |t|

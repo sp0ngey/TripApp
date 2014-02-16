@@ -557,6 +557,46 @@ $(function() {
 
     $('#TripSave').click ( function() { SaveTrip() } );
 
+    //This part votes trip up or down in ajax way
+    $('#voteUpLink').click (function()
+    {
+        $.ajax({
+            type: 'post', // PUT via rails _method data item
+            url: '/trips/'+_myTripId+'/vote_up',
+            async: false,
+            data: {_method: "PUT"},
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+            success: function() {
+                console.log("Up vote increased by 1 successfully");
+                _myTripUpVoteCount = _myTripUpVoteCount + 1;
+                $('#voting_up').html(_myTripUpVoteCount);
+            },
+            error: function(jqXHR, status, error) {
+                console.log("up vote increase FAIL status: " + status + "\nerror: " + error);
+            }
+
+        });
+    });
+
+    $('#voteDownLink').click (function()
+    {
+        $.ajax({
+            type: 'post', // PUT via rails _method data item
+            url: '/trips/'+_myTripId+'/vote_down',
+            async: false,
+            data: {_method: "PUT"},
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+            success: function() {
+                console.log("Down vote increased by 1 successfully");
+                _myTripDownVoteCount = _myTripDownVoteCount + 1;
+                $('#voting_down').html(_myTripDownVoteCount);
+            },
+            error: function(jqXHR, status, error) {
+                console.log("Down vote increase FAIL status: " + status + "\nerror: " + error);
+            }
+
+        });
+    });
 
     // TODO why are the locations not ordered by start date like it's supposed to??? In fact, the order changes randomly on different occasions
     var orderedTripLocationJSON = _tripLocationJSON;

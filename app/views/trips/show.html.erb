@@ -2,6 +2,8 @@
     var _myUserId = <%= current_user().id %>;
     var _tripOwner = <%= @trip.user_id %>;
     var _myTripId = <%= @trip.id %>
+    var _myTripUpVoteCount = <%= @trip.up_vote %>
+    var _myTripDownVoteCount = <%= @trip.down_vote %>
     _tripLocationJSON = <%= raw @trip_items.to_json %>
 </script>
 
@@ -18,15 +20,20 @@
       <%= @trip.description %>
     </p>
 
+
+     <p>
+       <a href="#" id="voteUpLink">Vote Up</a>
+        <Div id="voting_up">
+            <%= @trip.up_vote %>
+        </Div>
+    </p>
     <p>
-      <b>Up vote:</b>
-      <%= @trip.up_vote %>
+      <a href="#" id="voteDownLink">Vote Down</a>
+      <Div id="voting_down">
+        <%= @trip.down_vote %>
+      </div>
     </p>
 
-    <p>
-      <b>Down vote:</b>
-      <%= @trip.down_vote %>
-    </p>
 
     <p>
       <b>Published:</b>
