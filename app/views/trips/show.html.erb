@@ -2,8 +2,6 @@
     var _myUserId = <%= current_user().id %>;
     var _tripOwner = <%= @trip.user_id %>;
     var _myTripId = <%= @trip.id %>
-    var _myTripUpVoteCount = <%= @trip.total_up_votes %>
-    var _myTripDownVoteCount = <%= @trip.total_down_votes %>
     _tripLocationJSON = <%= raw @trip_items.to_json %>
 </script>
 

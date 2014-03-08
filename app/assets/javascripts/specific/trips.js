@@ -573,6 +573,7 @@ $(function() {
             success: function() {
                 console.log("SAVED TO VOTES TABLE SUCCESSFULLY");
                 voteUpCountNew();
+                voteDownCountNew();
             },
             error: function(jqXHR, status, error) {
                 console.log("VOTES TABLE - SAVE FAIL status: " + status + "\nerror: " + error);
@@ -596,6 +597,7 @@ $(function() {
             success: function() {
                 console.log("Down vote increased by 1 successfully");
                 voteDownCountNew();
+                voteUpCountNew();
             },
             error: function(jqXHR, status, error) {
                 console.log("Down vote increase FAIL status: " + status + "\nerror: " + error);

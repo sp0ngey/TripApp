@@ -178,23 +178,6 @@ class TripsController < ApplicationController
     end
   end
 
-  def vote_up
-    @trip = Trip.find(params[:id])
-    @trip.update_attribute :up_vote, @trip.up_vote + 1
-    respond_to do |format|
-      format.html {redirect_to @trip}
-      format.js
-    end
-  end
-
-  def vote_down
-    @trip = Trip.find(params[:id])
-    @trip.update_attribute :down_vote, @trip.down_vote + 1
-    respond_to do |format|
-      format.html {redirect_to :back}
-      format.js
-    end
-  end
 
   def total_up_votes
     @trip = Trip.find(params[:id])
