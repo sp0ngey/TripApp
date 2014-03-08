@@ -2,8 +2,8 @@
     var _myUserId = <%= current_user().id %>;
     var _tripOwner = <%= @trip.user_id %>;
     var _myTripId = <%= @trip.id %>
-    var _myTripUpVoteCount = <%= @trip.up_vote %>
-    var _myTripDownVoteCount = <%= @trip.down_vote %>
+    var _myTripUpVoteCount = <%= @trip.total_up_votes %>
+    var _myTripDownVoteCount = <%= @trip.total_down_votes %>
     _tripLocationJSON = <%= raw @trip_items.to_json %>
 </script>
 
@@ -22,17 +22,20 @@
 
 
      <p>
-       <a href="#" id="voteUpLink">Vote Up</a>
+       <a href="#" id="voteUpLink"><%= image_tag('like.png') %></a>
         <Div id="voting_up">
-            <%= @trip.up_vote %>
+            <%= @trip.total_up_votes %>
         </Div>
     </p>
     <p>
-      <a href="#" id="voteDownLink">Vote Down</a>
+      <a href="#" id="voteDownLink"><%= image_tag('dislike.png') %></a>
       <Div id="voting_down">
-        <%= @trip.down_vote %>
+        <%= @trip.total_down_votes %>
       </div>
     </p>
+
+    <%# commented out the none ajax way of casting a vote - leaving it here just for reference %>
+    <%#= link_to('cast vote up', cast_vote_path(:user_id => current_user(), :vote_type => 'Up'), :method => :put) %>
 
 
     <p>

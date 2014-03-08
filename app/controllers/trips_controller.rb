@@ -196,6 +196,24 @@ class TripsController < ApplicationController
     end
   end
 
+  def total_up_votes
+    @trip = Trip.find(params[:id])
+    @trip.total_up_votes
+    respond_to do |format|
+      format.html {redirect_to :back}
+      format.json { render json: @trip.total_up_votes }
+    end
+  end
+
+  def total_down_votes
+    @trip = Trip.find(params[:id])
+    @trip.total_down_votes
+    respond_to do |format|
+      format.html {redirect_to :back}
+      format.json { render json: @trip.total_down_votes }
+    end
+  end
+
 protected
 
   def getComponentsFromGeocodeAddressComponents(addrComponents)

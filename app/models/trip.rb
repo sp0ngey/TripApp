@@ -1,6 +1,15 @@
 class Trip < ActiveRecord::Base
   belongs_to :user
   has_many :trip_items
+  has_many :votes
+
+  def total_up_votes
+    self.votes.where("vote_type = ?" , 'Up').count
+  end
+
+  def total_down_votes
+    self.votes.where("vote_type = ?" , 'Down').count
+  end
 
   def self.search(keyword)
     if keyword

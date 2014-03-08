@@ -557,39 +557,45 @@ $(function() {
 
     $('#TripSave').click ( function() { SaveTrip() } );
 
-    //This part votes trip up or down in ajax way
+
+    //This part votes trip up in ajax way
     $('#voteUpLink').click (function()
     {
+        var voteType = "Up";
+
         $.ajax({
-            type: 'post', // PUT via rails _method data item
-            url: '/trips/'+_myTripId+'/vote_up',
+            type: 'post',
+            url: '/trips/'+_myTripId+'/cast_vote',
             async: false,
-            data: {_method: "PUT"},
+            data: {user_id: _myUserId, trip_id: _myTripId, vote_type: voteType, _method: "PUT"},
             contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+            //dataType: 'json', //data you expect back from server...NOT what you send to the server!
             success: function() {
-                console.log("Up vote increased by 1 successfully");
-                _myTripUpVoteCount = _myTripUpVoteCount + 1;
-                $('#voting_up').html(_myTripUpVoteCount);
+                console.log("SAVED TO VOTES TABLE SUCCESSFULLY");
+                voteUpCountNew();
             },
             error: function(jqXHR, status, error) {
-                console.log("up vote increase FAIL status: " + status + "\nerror: " + error);
+                console.log("VOTES TABLE - SAVE FAIL status: " + status + "\nerror: " + error);
             }
-
         });
+
+
+
     });
 
+    //This part votes trip down in ajax way
     $('#voteDownLink').click (function()
     {
+        var voteType = "Down";
         $.ajax({
             type: 'post', // PUT via rails _method data item
-            url: '/trips/'+_myTripId+'/vote_down',
+            url: '/trips/'+_myTripId+'/cast_vote',
             async: false,
-            data: {_method: "PUT"},
+            data: {user_id: _myUserId, trip_id: _myTripId, vote_type: voteType, _method: "PUT"},
             contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
             success: function() {
                 console.log("Down vote increased by 1 successfully");
-                _myTripDownVoteCount = _myTripDownVoteCount + 1;
-                $('#voting_down').html(_myTripDownVoteCount);
+                voteDownCountNew();
             },
             error: function(jqXHR, status, error) {
                 console.log("Down vote increase FAIL status: " + status + "\nerror: " + error);
@@ -617,3 +623,29 @@ $(function() {
 
 
 });
+
+function voteUpCountNew()
+{
+    $.ajax({
+        type: "GET",
+        dataType: "json",
+        url: '/trips/'+_myTripId+'/total_up_votes',
+        success: function(data){
+            $('#voting_up').text(data);
+        }
+    });
+
+}
+
+function voteDownCountNew()
+{
+    $.ajax({
+        type: "GET",
+        dataType: "json",
+        url: '/trips/'+_myTripId+'/total_down_votes',
+        success: function(data){
+            $('#voting_down').text(data);
+        }
+    });
+
+}

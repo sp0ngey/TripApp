@@ -1,4 +1,7 @@
 TripApp::Application.routes.draw do
+
+  resources :votes
+
   resources :photos
 
   get "sessions/login"
@@ -27,6 +30,9 @@ TripApp::Application.routes.draw do
   match "/trips/create" => "trips#create"
   match 'trips/:id/vote_up' => 'trips#vote_up', :as => :vote_up
   match 'trips/:id/vote_down' => 'trips#vote_down', :as => :vote_down
+  match "/trips/:id/cast_vote" => "votes#cast_vote", :as => :cast_vote
+  match "/trips/:id/total_up_votes" => "trips#total_up_votes", :as => :total_up_votes
+  match "/trips/:id/total_down_votes" => "trips#total_down_votes", :as => :total_down_votes
 
   match "/auth/:provider/callback" => "sessions#create"
   match "/auth/failure" => "sessions#failure"
